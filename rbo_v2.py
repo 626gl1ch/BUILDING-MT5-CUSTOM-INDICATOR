@@ -147,21 +147,56 @@ def signal_rsi_divergence(df, p):
     n = len(df)
     signals = np.zeros(n)
 
-    for i in range(lb + 1, n):
-        c_now = close_arr[i]
-        r_now = rsi_arr[i]
-        c_prev = np.min(close_arr[i - lb:i])
-        r_prev_min = rsi_arr[np.argmin(close_arr[i - lb:i]) + i - lb]
-        c_prev_h = np.max(close_arr[i - lb:i])
-        r_prev_max = rsi_arr[np.argmax(close_arr[i - lb:i]) + i - lb]
-        z = zs_arr[i]
+    if n <= lb:
+        return pd.Series(signals, index=df.index)
 
-        # Bullish divergence: price lower low but RSI higher low + price extended down
-        if c_now < c_prev and r_now > r_prev_min and z < -p['zscore_thresh']:
-            signals[i] = 1
-        # Bearish divergence: price higher high but RSI lower high + price extended up
-        elif c_now > c_prev_h and r_now < r_prev_max and z > p['zscore_thresh']:
-            signals[i] = -1
+    # Fast numpy rolling window trick
+    def rolling_window(a, window):
+        shape = a.shape[:-1] + (a.shape[-1] - window + 1, window)
+        strides = a.strides + (a.strides[-1],)
+        return np.lib.stride_tricks.as_strided(a, shape=shape, strides=strides)
+
+    # Create overlapping windows of length `lb`
+    # We want window i to cover close_arr[i-lb:i]. 
+    # The valid windows start at index lb.
+    c_windows = rolling_window(close_arr, lb)
+    r_windows = rolling_window(rsi_arr, lb)
+
+    # Min/Max across the windows
+    c_prev = np.min(c_windows, axis=1)
+    c_prev_h = np.max(c_windows, axis=1)
+
+    # Argmin/Argmax to find the index of the min/max close within the window
+    min_idx = np.argmin(c_windows, axis=1)
+    max_idx = np.argmax(c_windows, axis=1)
+
+    # Extract the corresponding RSI values using advanced indexing
+    row_indices = np.arange(len(c_windows))
+    r_prev_min = r_windows[row_indices, min_idx]
+    r_prev_max = r_windows[row_indices, max_idx]
+
+    # Align the arrays for vector operations. 
+    # c_windows[0] corresponds to indices 0 to lb-1, which is what we need for calculating signal at index lb.
+    # Therefore, the corresponding "now" values start from index lb.
+    c_now = close_arr[lb:]
+    r_now = rsi_arr[lb:]
+    z_now = zs_arr[lb:]
+
+    # Pad the previous values so they match the length of `c_now`
+    # c_windows has length n - lb + 1. We only need up to n - lb (so we exclude the very last window).
+    c_prev = c_prev[:-1]
+    c_prev_h = c_prev_h[:-1]
+    r_prev_min = r_prev_min[:-1]
+    r_prev_max = r_prev_max[:-1]
+
+    # Bullish: lower low in price, higher low in RSI, extended down
+    bullish = (c_now < c_prev) & (r_now > r_prev_min) & (z_now < -p['zscore_thresh'])
+    
+    # Bearish: higher high in price, lower high in RSI, extended up
+    bearish = (c_now > c_prev_h) & (r_now < r_prev_max) & (z_now > p['zscore_thresh'])
+
+    signals[lb:][bullish] = 1
+    signals[lb:][bearish] = -1
 
     return pd.Series(signals, index=df.index)
 
@@ -304,60 +339,60 @@ GRIDS = {
     'ema_pullback': {
         'fn': signal_ema_pullback,
         'params': {
-            'fast_ema':    [9, 20],
-            'trend_ema':   [50, 100, 200],
-            'adx_min':     [15, 20, 25],
-            'sl_atr':      [1.5, 2.0, 2.5],
-            'tp_atr':      [3.0, 4.0, 6.0],
-            'max_bars_hold': [12, 24, 36]
+            'fast_ema':    [5, 9, 14, 20],
+            'trend_ema':   [50, 100, 150, 200],
+            'adx_min':     [15, 20, 25, 30],
+            'sl_atr':      [1.0, 1.5, 2.0, 2.5, 3.0],
+            'tp_atr':      [2.0, 3.0, 4.0, 5.0, 6.0],
+            'max_bars_hold': [12, 24, 48, 72]
         }
     },
     'donchian_breakout': {
         'fn': signal_donchian_breakout,
         'params': {
-            'period':        [10, 20, 50],
-            'vol_min':       [1.2, 1.5, 2.0],
-            'sl_atr':        [2.0, 2.5],
-            'tp_atr':        [4.0, 6.0, 8.0],
-            'max_bars_hold': [24, 48, 72]
+            'period':        [10, 20, 30, 50],
+            'vol_min':       [1.2, 1.5, 1.8, 2.0],
+            'sl_atr':        [1.5, 2.0, 2.5, 3.0],
+            'tp_atr':        [3.0, 4.0, 6.0, 8.0],
+            'max_bars_hold': [24, 48, 72, 96]
         }
     },
     'bb_vwap_mr': {
         'fn': signal_bb_vwap_mr,
         'params': {
-            'bb_period':     [10, 20],
-            'rsi_period':    [9, 14],
-            'rsi_os':        [30, 35],
-            'rsi_ob':        [65, 70],
-            'sl_atr':        [1.5, 2.0],
-            'tp_atr':        [2.0, 3.0, 4.0],
-            'max_bars_hold': [6, 12, 24]
+            'bb_period':     [10, 20, 30],
+            'rsi_period':    [9, 14, 21],
+            'rsi_os':        [25, 30, 35],
+            'rsi_ob':        [65, 70, 75],
+            'sl_atr':        [1.0, 1.5, 2.0, 2.5],
+            'tp_atr':        [2.0, 3.0, 4.0, 5.0],
+            'max_bars_hold': [6, 12, 24, 48]
         }
     },
     'rsi_divergence': {
         'fn': signal_rsi_divergence,
         'params': {
-            'rsi_period':    [9, 14],
-            'zscore_thresh': [1.5, 2.0],
-            'lookback':      [5, 10, 14],
-            'sl_atr':        [1.5, 2.0],
-            'tp_atr':        [2.0, 3.0],
-            'max_bars_hold': [12, 24]
+            'rsi_period':    [9, 14, 21],
+            'zscore_thresh': [1.5, 2.0, 2.5],
+            'lookback':      [5, 10, 14, 20],
+            'sl_atr':        [1.0, 1.5, 2.0, 2.5],
+            'tp_atr':        [2.0, 3.0, 4.0, 5.0],
+            'max_bars_hold': [12, 24, 48]
         }
     },
-
     'squeeze_breakout': {
         'fn': signal_squeeze_breakout,
         'params': {
-            'period':        [10, 20],
-            'vol_min':       [1.5, 2.0],
-            'squeeze_lb':    [5, 10],
-            'sl_atr':        [1.5, 2.0, 2.5],
-            'tp_atr':        [3.0, 4.0, 6.0],
-            'max_bars_hold': [12, 24]
+            'period':        [10, 20, 30],
+            'vol_min':       [1.2, 1.5, 2.0],
+            'squeeze_lb':    [5, 10, 15],
+            'sl_atr':        [1.5, 2.0, 2.5, 3.0],
+            'tp_atr':        [3.0, 4.0, 5.0, 6.0],
+            'max_bars_hold': [12, 24, 48]
         }
     }
 }
+
 
 
 # ─────────────────────────────────────────────────────────────
