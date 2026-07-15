@@ -156,12 +156,27 @@ def main():
     print("Precomputing regime thresholds (trailing 70th percentile)...")
     df = precompute_regime_thresholds(df)
     
-    # 1. Define the parameters for our 5 strategies
-    p_ema = {'fast_ema': 9, 'trend_ema': 50, 'adx_min': 20, 'sl_atr': 2.5, 'tp_atr': 5.0}
-    p_donchian = {'period': 20, 'vol_min': 1.5, 'sl_atr': 2.5, 'tp_atr': 5.0}
-    p_bbvwap = {'bb_period': 20, 'rsi_period': 14, 'rsi_os': 30, 'rsi_ob': 70, 'sl_atr': 2.5, 'tp_atr': 5.0}
-    p_rsi_div = {'rsi_period': 14, 'zscore_thresh': 2.0, 'lookback': 10, 'sl_atr': 2.5, 'tp_atr': 5.0}
-    p_squeeze = {'period': 20, 'vol_min': 1.5, 'squeeze_lb': 10, 'sl_atr': 2.5, 'tp_atr': 5.0}
+    import json
+    confirmed_file = "strategies_confirmed.json"
+    confirmed_strats = {}
+    if os.path.exists(confirmed_file):
+        with open(confirmed_file, "r") as f:
+            confirmed_strats = json.load(f)
+            
+    def get_params(stype, default_params):
+        """Helper to get the top confirmed params for a strategy type, or fallback to default."""
+        if stype in confirmed_strats and len(confirmed_strats[stype]) > 0:
+            print(f"Loaded validated params for {stype}")
+            return confirmed_strats[stype][0]['params']
+        print(f"WARNING: No validated params found for {stype}, using defaults.")
+        return default_params
+
+    # 1. Define the parameters (either from RBO or fallback)
+    p_ema = get_params('ema_pullback', {'fast_ema': 9, 'trend_ema': 50, 'adx_min': 20, 'sl_atr': 2.5, 'tp_atr': 5.0})
+    p_donchian = get_params('donchian_breakout', {'period': 20, 'vol_min': 1.5, 'sl_atr': 2.5, 'tp_atr': 5.0})
+    p_bbvwap = get_params('bb_vwap_mr', {'bb_period': 20, 'rsi_period': 14, 'rsi_os': 30, 'rsi_ob': 70, 'sl_atr': 2.5, 'tp_atr': 5.0})
+    p_rsi_div = get_params('rsi_divergence', {'rsi_period': 14, 'zscore_thresh': 2.0, 'lookback': 10, 'sl_atr': 2.5, 'tp_atr': 5.0})
+    p_squeeze = get_params('squeeze_breakout', {'period': 20, 'vol_min': 1.5, 'squeeze_lb': 10, 'sl_atr': 2.5, 'tp_atr': 5.0})
 
     # 2. Build the Strategy Menu Wrappers
     strategy_menu = [

@@ -345,29 +345,7 @@ GRIDS = {
             'max_bars_hold': [12, 24]
         }
     },
-    'orb': {
-        'fn': signal_orb,
-        'params': {
-            'or_bars':       [6, 12],
-            'vol_min':       [1.5, 2.0],
-            'sl_atr':        [1.5, 2.0, 2.5],
-            'tp_atr':        [2.0, 3.0, 4.0],
-            'max_bars_hold': [12, 24, 48]
-        }
-    },
-    'macd_scalp': {
-        'fn': signal_macd_scalp,
-        'params': {
-            'macd_type':     ['fast', 'standard'],
-            'bias_ema':      [50, 200],
-            'stoch_period':  [9, 14],
-            'stoch_ob':      [70, 80],
-            'stoch_os':      [20, 30],
-            'sl_atr':        [1.0, 1.5, 2.0],
-            'tp_atr':        [2.0, 3.0],
-            'max_bars_hold': [6, 12, 24]
-        }
-    },
+
     'squeeze_breakout': {
         'fn': signal_squeeze_breakout,
         'params': {
