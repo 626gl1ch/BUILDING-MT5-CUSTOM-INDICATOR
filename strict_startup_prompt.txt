@@ -1,0 +1,11 @@
+for this project i want the RBO system is to use the search bots to find genuinely validated strategy parameters, plug them into this Meta-Controller, and let it dynamically allocate capital across true edges : 
+
+IMPORTANT
+Strictness of RBO Validation Gates The validation gates in backtest_core.py are notoriously strict. It is very possible that for some strategy types (like squeeze_breakout), the bot will scan 120 combinations and find 0 that pass all Walk-Forward and Permutation checks.
+
+Question: If the search bot fails to find a confirmed strategy for one of the 5 types, how would you like to handle it?
+
+1. Allow the Meta-Controller to train with fewer than 5 strategies (e.g., a menu of only the 3 confirmed strategies).
+2. Automatically lower the RBO validation thresholds slightly and re-run the search for that specific strategy until one passes.
+
+###. MY ANSWER IS FIRST FIND ATLEAST 5 TO 10 STRATEGIES THAT PAASES THE WALKFORWARD TEST & THE PERMUTATION TEST THEN CONTINUE FROM THEM BUT FOR NOW DO NOT "lower the RBO validation thresholds slightly and re-run the search for that specific strategy until one passes.", Ensure to save the strategies that passed the walkforward test, standard backtest & permutation test for all the csv historical data into a txt file. i want the complete strategies startegies in full, their logics, settings, indicators, entry/exit/during trade descision & conditions etc eveyrthing & also i want the results for their PF, WR, sharpe ratio.
