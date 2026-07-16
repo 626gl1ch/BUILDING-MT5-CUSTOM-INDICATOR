@@ -47,7 +47,7 @@ class BacktestCore:
     # CORE BACKTEST ENGINE
     # ─────────────────────────────────────────────────
 
-    def run_backtest(self, df, signals, sl_atr=2.0, tp_atr=4.0, max_bars_hold=48):
+    def run_backtest(self, df, signals, sl_atr=2.0, tp_atr=4.0, max_bars_hold=48, slippage_pct=0.0002, fee_pct=0.0005):
         """
         Runs a percentage-based backtest.
         - Signals generated at close[i] → entry at open[i+1]
@@ -121,7 +121,8 @@ class BacktestCore:
                     stop_dist_pct = 0.001
 
                 raw_return = (exit_pr - entry_pr) / entry_pr * direction
-                net_return = raw_return - 2 * self.commission
+                # Subtract fees and slippage on both entry and exit (2x fee, 2x slippage)
+                net_return = raw_return - (2 * fee_pct) - (2 * slippage_pct)
                 trade_pnl = capital * self.risk_pct * (net_return / stop_dist_pct)
                 capital += trade_pnl
 
@@ -260,7 +261,7 @@ class BacktestCore:
     # MULTI-SYMBOL RUNNERS
     # ─────────────────────────────────────────────────
 
-    def run_multi_symbol(self, all_dfs, strategy_fn, params):
+    def run_multi_symbol(self, all_dfs, strategy_fn, params, slippage_pct=0.0002, fee_pct=0.0005):
         """Runs backtest on all symbols. Returns per-symbol and aggregate metrics."""
         results = {}
         total_trades = 0
@@ -275,7 +276,9 @@ class BacktestCore:
                 df, signals,
                 sl_atr=params.get('sl_atr', 2.0),
                 tp_atr=params.get('tp_atr', 4.0),
-                max_bars_hold=params.get('max_bars_hold', 48)
+                max_bars_hold=params.get('max_bars_hold', 48),
+                slippage_pct=slippage_pct,
+                fee_pct=fee_pct
             )
 
             metrics = self.calculate_metrics(trades, final_bal)
@@ -312,7 +315,7 @@ class BacktestCore:
 
         return results, aggregate, all_trades
 
-    def run_walkforward(self, all_dfs, strategy_fn, params, split_pct=0.70):
+    def run_walkforward(self, all_dfs, strategy_fn, params, split_pct=0.70, slippage_pct=0.0002, fee_pct=0.0005):
         """
         Splits each symbol 70/30. Runs backtest on IS and OOS independently.
         Returns IS and OOS aggregated metrics.
@@ -323,14 +326,14 @@ class BacktestCore:
             is_dfs[symbol] = df.iloc[:idx].copy()
             oos_dfs[symbol] = df.iloc[idx:].copy()
 
-        _, is_agg, _ = self.run_multi_symbol(is_dfs, strategy_fn, params)
-        _, oos_agg, _ = self.run_multi_symbol(oos_dfs, strategy_fn, params)
+        _, is_agg, _ = self.run_multi_symbol(is_dfs, strategy_fn, params, slippage_pct, fee_pct)
+        _, oos_agg, _ = self.run_multi_symbol(oos_dfs, strategy_fn, params, slippage_pct, fee_pct)
 
         return {'in_sample': is_agg, 'out_of_sample': oos_agg}
 
     def run_full_validation(self, all_dfs, strategy_fn, params,
                             min_trades_per_day=3.0, min_assets=4,
-                            n_permutations=200):
+                            n_permutations=200, slippage_pct=0.0002, fee_pct=0.0005):
         """
         Full 3-layer validation pipeline:
           1. Standard Backtest (all assets, positive expectancy + frequency)
@@ -340,14 +343,14 @@ class BacktestCore:
         Returns a result dict with 'passed' = True only if ALL gates pass.
         """
         # --- Layer 1: Standard Backtest ---
-        sym_results, agg, all_trades = self.run_multi_symbol(all_dfs, strategy_fn, params)
+        sym_results, agg, all_trades = self.run_multi_symbol(all_dfs, strategy_fn, params, slippage_pct, fee_pct)
 
         gate1_assets = agg['active_symbols'] >= min_assets
         gate1_expectancy = agg['expectancy'] > 0
         gate1_frequency = agg['trades_per_day'] >= min_trades_per_day
 
         # --- Layer 2: Walk-Forward ---
-        wf = self.run_walkforward(all_dfs, strategy_fn, params)
+        wf = self.run_walkforward(all_dfs, strategy_fn, params, split_pct=0.70, slippage_pct=slippage_pct, fee_pct=fee_pct)
         is_agg = wf['in_sample']
         oos_agg = wf['out_of_sample']
 

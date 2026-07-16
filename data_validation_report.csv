@@ -1,0 +1,5 @@
+file_name,date_range,total_bars,duplicates,gaps_longer_than_5m,max_gap_minutes,bad_prices_zeros_or_neg,extreme_outliers
+BTCUSDT_5min_1year.csv,2025-07-06 07:15:00 to 2026-07-06 07:15:00,105121,0,0,0,0,0
+LTCUSDT_5min_1year.csv,2025-07-06 07:20:00 to 2026-07-06 07:20:00,105121,0,0,0,0,0
+SOLUSDT_5min_1year.csv,2025-07-06 07:15:00 to 2026-07-06 07:15:00,105121,0,0,0,0,0
+TRUMPUSDT_5min_1year.csv,2025-07-06 07:25:00 to 2026-07-06 07:25:00,105121,0,0,0,0,0
