@@ -4,6 +4,7 @@ import os
 import glob
 from backtest_core import BacktestCore
 from rbo_v2 import signal_ema_pullback, signal_donchian_breakout
+from logger_config import logger
 
 def load_1h_data():
     """Loads all 1H data files"""
@@ -27,13 +28,13 @@ def run_cost_stress_test(base_params: dict, strategy_fn, all_dfs: dict,
     engine = BacktestCore(commission=0) # Commission bypassed, handled by dynamic fees
     results = []
     
-    print(f"\n--- Running Cost-Stress Test for {strategy_fn.__name__} ---")
+    logger.info(f"--- Running Cost-Stress Test for {strategy_fn.__name__} ---")
     
     for mult in multipliers:
         stressed_slippage = base_slippage_pct * mult
         stressed_fee = base_fee_pct * mult
         
-        print(f"Testing at {mult}x Cost (Slippage: {stressed_slippage*10000:.1f}bps, Fee: {stressed_fee*10000:.1f}bps)")
+        logger.info(f"Testing at {mult}x Cost (Slippage: {stressed_slippage*10000:.1f}bps, Fee: {stressed_fee*10000:.1f}bps)")
         
         res = engine.run_full_validation(
             all_dfs, strategy_fn, base_params,
@@ -57,8 +58,7 @@ def run_cost_stress_test(base_params: dict, strategy_fn, all_dfs: dict,
         })
         
     df_res = pd.DataFrame(results)
-    print("\nCost-Stress Test Results:")
-    print(df_res.to_string(index=False))
+    logger.info("Cost-Stress Test Results:\n" + df_res.to_string(index=False))
     return df_res
 
 def run_sensitivity_sweep(base_params: dict, strategy_fn, all_dfs: dict, 
@@ -69,7 +69,7 @@ def run_sensitivity_sweep(base_params: dict, strategy_fn, all_dfs: dict,
     engine = BacktestCore(commission=0)
     results = []
     
-    print(f"\n--- Running Parameter Sensitivity Sweep for {strategy_fn.__name__} ---")
+    logger.info(f"--- Running Parameter Sensitivity Sweep for {strategy_fn.__name__} ---")
     
     for shift in shifts:
         # Create shifted params
@@ -85,7 +85,7 @@ def run_sensitivity_sweep(base_params: dict, strategy_fn, all_dfs: dict,
             else:
                 p_shifted[k] = v
                 
-        print(f"Testing Shift {shift*100:+.0f}%")
+        logger.info(f"Testing Shift {shift*100:+.0f}%")
         
         res = engine.run_full_validation(
             all_dfs, strategy_fn, p_shifted,
@@ -106,13 +106,12 @@ def run_sensitivity_sweep(base_params: dict, strategy_fn, all_dfs: dict,
         })
         
     df_res = pd.DataFrame(results)
-    print("\nSensitivity Sweep Results:")
-    print(df_res.to_string(index=False))
+    logger.info("Sensitivity Sweep Results:\n" + df_res.to_string(index=False))
     return df_res
 
 
 if __name__ == "__main__":
-    print("Loading 1H Data...")
+    logger.info("Loading 1H Data...")
     dfs = load_1h_data()
     
     # We will test a dummy or known parameter set for EMA Pullback.
@@ -133,4 +132,4 @@ if __name__ == "__main__":
         run_cost_stress_test(sample_params, signal_ema_pullback, dfs)
         run_sensitivity_sweep(sample_params, signal_ema_pullback, dfs)
     else:
-        print("No 1H data found. Please run data_resampler.py first.")
+        logger.warning("No 1H data found. Please run data_resampler.py first.")

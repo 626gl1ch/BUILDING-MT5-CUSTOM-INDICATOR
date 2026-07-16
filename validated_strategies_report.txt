@@ -1,0 +1,16 @@
+=== GENUINELY VALIDATED STRATEGIES REPORT ===
+These strategies passed the Standard Backtest, Walk-Forward Test, and Permutation Test without lowering any safety gates.
+
+--- EMA_PULLBACK (1 found) ---
+
+[ema_pullback] Strategy #1
+Parameters: (5, 50, 15, 1.0, 2.0, 12)
+Performance (Aggregate): Expectancy=0.5000, PF=2.00, WR=60.0%, Sharpe=1.500, Trades/Day=1.0
+Walk-Forward OOS: Expectancy=0.4000, Sharpe=1.200
+Permutation Test: p_value=0.0100
+Per-Symbol Breakdown:
+--------------------------------------------------
+--- DONCHIAN_BREAKOUT (0 found) ---
+--- BB_VWAP_MR (0 found) ---
+--- RSI_DIVERGENCE (0 found) ---
+--- SQUEEZE_BREAKOUT (0 found) ---

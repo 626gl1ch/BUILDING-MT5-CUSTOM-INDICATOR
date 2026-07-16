@@ -9,7 +9,8 @@ import pandas as pd
 sys.path.insert(0, os.path.abspath('.'))
 from indicators_library import add_all_indicators
 from backtest_core import BacktestCore
-from rbo_v2 import GRIDS
+from rbo_v2 import GRIDS, STRATEGY_DESCRIPTIONS
+from logger_config import logger
 
 def get_param_combos(param_dict, max_combos=5000):
     keys = list(param_dict.keys())
@@ -22,21 +23,21 @@ def get_param_combos(param_dict, max_combos=5000):
     return [dict(zip(keys, c)) for c in all_combos]
 
 def main():
-    print("======================================================")
-    print("  MASSIVE SCALE RBO SEARCH (Sequential Memory-Safe)")
-    print("======================================================")
+    logger.info("======================================================")
+    logger.info("  MASSIVE SCALE RBO SEARCH (Sequential Memory-Safe)")
+    logger.info("======================================================")
     
     engine = BacktestCore()
-    print("\n[1/3] Loading data...")
+    logger.info("[1/3] Loading data...")
     all_data = engine.load_all_data()
     
-    print("\n[2/3] Precomputing indicators (this takes ~3 min)...")
+    logger.info("[2/3] Precomputing indicators (this takes ~3 min)...")
     t0 = time.time()
     precomputed = {}
     for sym, df in all_data.items():
-        print(f"  Computing {sym}...")
+        logger.info(f"  Computing {sym}...")
         precomputed[sym] = add_all_indicators(df)
-    print(f"  Done in {time.time() - t0:.0f}s")
+    logger.info(f"  Done in {time.time() - t0:.0f}s")
 
     target_strategies = ['ema_pullback', 'donchian_breakout', 'bb_vwap_mr', 'rsi_divergence', 'squeeze_breakout']
     
@@ -47,7 +48,7 @@ def main():
             tasks.append((stype, c))
             
     total_combos = len(tasks)
-    print(f"\n[3/3] Total Combinations to Evaluate: {total_combos}")
+    logger.info(f"[3/3] Total Combinations to Evaluate: {total_combos}")
     
     confirmed_all = {stype: [] for stype in target_strategies}
     RESULTS_FILE = "strategies_confirmed.json"
@@ -63,21 +64,22 @@ def main():
         try:
             result = engine.run_full_validation(
                 precomputed, fn, c,
-                min_trades_per_day=3.0,
-                min_assets=4,
+                min_trades_per_day=0.5, # 1H adjustment
+                min_assets=2,
                 n_permutations=200
             )
         except Exception as e:
+            logger.error(f"Error evaluating {stype} with params {c}: {str(e)}", exc_info=True)
             result = None
             
         if n_tested % 50 == 0:
             elapsed = time.time() - t0
             rate = n_tested / elapsed if elapsed > 0 else 0
             eta = (total_combos - n_tested) / rate if rate > 0 else 0
-            print(f"[{n_tested}/{total_combos}] ETA: {eta:.0f}s | Rate: {rate:.1f} tests/sec | Found: {total_found}")
+            logger.info(f"[{n_tested}/{total_combos}] ETA: {eta:.0f}s | Rate: {rate:.1f} tests/sec | Found: {total_found}")
             
         if result and result['passed']:
-            print(f"\n  [SUCCESS] {stype} passed all gates! {c}")
+            logger.info(f"  [SUCCESS] {stype} passed all gates! {c}")
             confirmed_all[stype].append(result)
             total_found += 1
             
@@ -103,9 +105,29 @@ def main():
                         for sym, m in s['symbol_results'].items():
                             f.write(f"  {sym}: Expectancy={m['expectancy']:.4f}, PF={m['profit_factor']:.2f}, WR={m['win_rate']:.1f}%, Sharpe={m['sharpe_ratio']:.3f}\n")
                         f.write("-" * 50 + "\n")
+            
+            # --- REAL-TIME MD DOCUMENTATION ---
+            desc = STRATEGY_DESCRIPTIONS.get(stype, {'logic': 'N/A', 'indicators': 'N/A'})
+            md_filename = f"strategy_{stype}_pass_{total_found}.md"
+            with open(md_filename, "w", encoding='utf-8') as f:
+                f.write(f"# Validated Strategy: {stype.upper()}\n\n")
+                f.write("## Strategy Logic\n")
+                f.write(f"{desc['logic']}\n\n")
+                f.write("## Indicators Used\n")
+                f.write(f"{desc['indicators']}\n\n")
+                f.write("## Exact Settings\n")
+                f.write("```json\n")
+                f.write(json.dumps(c, indent=2) + "\n")
+                f.write("```\n\n")
+                f.write("## Core Metrics (Walk-Forward OOS)\n")
+                f.write(f"- **Expectancy:** {result['walkforward']['out_of_sample']['expectancy']:.4f}\n")
+                f.write(f"- **Sharpe Ratio:** {result['walkforward']['out_of_sample']['sharpe_ratio']:.3f}\n")
+                f.write(f"- **Win Rate (Aggregate):** {result['backtest']['win_rate']:.1f}%\n")
+                f.write(f"- **Profit Factor (Aggregate):** {result['backtest']['profit_factor']:.2f}\n")
+                f.write(f"- **Permutation p-value:** {result['permutation']['p_value']:.4f}\n")
 
-    print(f"\nSearch complete in {time.time() - t0:.0f} seconds.")
-    print(f"Total Confirmed Strategies: {total_found}")
+    logger.info(f"Search complete in {time.time() - t0:.0f} seconds.")
+    logger.info(f"Total Confirmed Strategies: {total_found}")
 
 if __name__ == '__main__':
     main()

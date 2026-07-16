@@ -331,6 +331,29 @@ def signal_squeeze_breakout(df, p):
     return signals
 
 
+STRATEGY_DESCRIPTIONS = {
+    'ema_pullback': {
+        'logic': 'Identifies a strong trend using a fast, slow, and trend EMA alignment along with high ADX. Enters when price pulls back (closes counter-trend) for a specified number of bars.',
+        'indicators': 'EMA (fast, slow, trend), ADX'
+    },
+    'donchian_breakout': {
+        'logic': 'Enters on a breakout of the Donchian Channel (highest high or lowest low over a period) combined with a minimum ADX threshold to ensure trend strength.',
+        'indicators': 'Donchian Channel, ADX'
+    },
+    'bb_vwap_mr': {
+        'logic': 'Mean Reversion strategy. Enters when price closes outside the Bollinger Bands but returns to inside the bands, provided the overall trend (via VWAP) is flat or opposing the spike.',
+        'indicators': 'Bollinger Bands, VWAP'
+    },
+    'rsi_divergence': {
+        'logic': 'Detects momentum divergence. Enters when price makes a new extreme over a lookback window, but RSI fails to make a new extreme, indicating exhausted momentum.',
+        'indicators': 'RSI, Rolling Price Extremes'
+    },
+    'squeeze_breakout': {
+        'logic': 'Detects volatility compression (squeeze) followed by an expansion. Enters when Bollinger Bands contract inside Keltner Channels, then expand sharply with high volume.',
+        'indicators': 'Bollinger Bands, Keltner Channels, Volume Spike'
+    }
+}
+
 # ─────────────────────────────────────────────────────────────
 # PARAMETER GRIDS
 # ─────────────────────────────────────────────────────────────

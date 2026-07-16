@@ -12,6 +12,7 @@ import pandas as pd
 import numpy as np
 import os
 import json
+from logger_config import logger
 
 
 class BacktestCore:
@@ -369,6 +370,9 @@ class BacktestCore:
         all_passed = (gate1_assets and gate1_expectancy and gate1_frequency
                       and gate2_oos_expectancy and gate2_sharpe_retention
                       and gate3_perm)
+                      
+        if not all_passed:
+            logger.debug(f"Failed Validation: Assets={gate1_assets}, Exp={gate1_expectancy}, Freq={gate1_frequency}, OOS_Exp={gate2_oos_expectancy}, OOS_Sharpe={gate2_sharpe_retention}, Perm={gate3_perm}")
 
         return {
             'passed': all_passed,

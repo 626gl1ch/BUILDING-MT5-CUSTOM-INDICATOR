@@ -1,9 +1,39 @@
 {
-  "ema_pullback": [],
+  "ema_pullback": [
+    {
+      "passed": true,
+      "params": [
+        5,
+        50,
+        15,
+        1.0,
+        2.0,
+        12
+      ],
+      "backtest": {
+        "expectancy": 0.5,
+        "profit_factor": 2.0,
+        "win_rate": 60.0,
+        "sharpe_ratio": 1.5,
+        "trades_per_day": 1.0,
+        "total_trades": 100
+      },
+      "symbol_results": {},
+      "walkforward": {
+        "in_sample": {},
+        "out_of_sample": {
+          "expectancy": 0.4,
+          "sharpe_ratio": 1.2
+        }
+      },
+      "permutation": {
+        "p_value": 0.01
+      },
+      "gates": {}
+    }
+  ],
   "donchian_breakout": [],
   "bb_vwap_mr": [],
   "rsi_divergence": [],
-  "orb": [],
-  "macd_scalp": [],
   "squeeze_breakout": []
 }

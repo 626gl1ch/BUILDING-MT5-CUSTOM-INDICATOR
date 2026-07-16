@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import os
 import glob
+from logger_config import logger
 
 def validate_data(df: pd.DataFrame, file_name: str) -> dict:
     """
@@ -125,35 +126,35 @@ def reconcile_resample(source_df: pd.DataFrame, hourly_df: pd.DataFrame) -> bool
         np.isclose(expected_vol, actual["volume"])
     )
     
-    if not match:
-        print(f"Reconciliation FAILED for {sample_hour}")
-        print(f"Expected: O={expected_open}, H={expected_high}, L={expected_low}, C={expected_close}, V={expected_vol}")
-        print(f"Actual:   O={actual['open']}, H={actual['high']}, L={actual['low']}, C={actual['close']}, V={actual['volume']}")
-    return match
+        if not match:
+            logger.warning(f"Reconciliation FAILED for {sample_hour}")
+            logger.warning(f"Expected: O={expected_open}, H={expected_high}, L={expected_low}, C={expected_close}, V={expected_vol}")
+            logger.warning(f"Actual:   O={actual['open']}, H={actual['high']}, L={actual['low']}, C={actual['close']}, V={actual['volume']}")
+        return match
 
 def run_pipeline():
     files = glob.glob("*_5min_*.csv")
     if not files:
-        print("No 5min CSV files found.")
+        logger.warning("No 5min CSV files found.")
         return
 
     reports = []
     
-    print("=== DATA VALIDATION ===")
+    logger.info("=== DATA VALIDATION ===")
     for f in files:
-        print(f"Validating {f}...")
+        logger.info(f"Validating {f}...")
         df = pd.read_csv(f)
         report = validate_data(df, f)
         reports.append(report)
         for k, v in report.items():
-            print(f"  {k}: {v}")
+            logger.debug(f"  {k}: {v}")
             
-        print(f"\nResampling {f} to 1hr...")
+        logger.info(f"Resampling {f} to 1hr...")
         hourly_df = resample_to_1h(df)
         
         # Reconciliation
         passed = reconcile_resample(df, hourly_df)
-        print(f"  Reconciliation Check: {'PASS' if passed else 'FAIL'}")
+        logger.info(f"  Reconciliation Check: {'PASS' if passed else 'FAIL'}")
         
         # Save output
         out_name = f.replace("5min", "1H")
@@ -162,12 +163,12 @@ def run_pipeline():
         # Rename timestamp back to datetime for the indicators library expectations
         save_df = save_df.rename(columns={'timestamp': 'datetime'})
         save_df.to_csv(out_name, index=False)
-        print(f"  Saved {out_name}\n")
+        logger.info(f"  Saved {out_name}\n")
         
     # Write validation report to file
     report_df = pd.DataFrame(reports)
     report_df.to_csv("data_validation_report.csv", index=False)
-    print("Validation report saved to data_validation_report.csv")
+    logger.info("Validation report saved to data_validation_report.csv")
 
 if __name__ == "__main__":
     run_pipeline()
