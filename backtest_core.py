@@ -27,21 +27,21 @@ class BacktestCore:
     # DATA LOADING
     # ─────────────────────────────────────────────────
 
-    def load_all_data(self):
-        """Loads all available historical CSV data files."""
+    def load_all_data(self, suffix="5min_1year"):
+        """Loads all available historical CSV data files matching the suffix."""
         data = {}
         for symbol in self.symbols:
-            filepath = os.path.join(self.data_dir, f"{symbol}_5min_1year.csv")
+            filepath = os.path.join(self.data_dir, f"{symbol}_{suffix}.csv")
             if not os.path.exists(filepath):
-                filepath = f"{symbol}_5min_1year.csv"
+                filepath = f"{symbol}_{suffix}.csv"
             if os.path.exists(filepath):
                 df = pd.read_csv(filepath, parse_dates=['datetime'])
                 df.set_index('datetime', inplace=True)
                 df.sort_index(inplace=True)
                 data[symbol] = df
-                print(f"  Loaded {symbol}: {len(df):,} rows")
+                logger.info(f"  Loaded {symbol}_{suffix}: {len(df):,} rows")
             else:
-                print(f"  Warning: File not found: {filepath}")
+                logger.warning(f"  File not found: {filepath}")
         return data
 
     # ─────────────────────────────────────────────────

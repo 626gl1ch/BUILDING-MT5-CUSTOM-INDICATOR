@@ -43,10 +43,10 @@ def validate_data(df: pd.DataFrame, file_name: str) -> dict:
     }
     return report
 
-def resample_to_1h(df: pd.DataFrame) -> pd.DataFrame:
+def resample_data(df: pd.DataFrame, timeframe: str) -> pd.DataFrame:
     """
-    Resamples lower timeframe OHLCV data to 1H strict bars.
-    Drops any incomplete hour bars to prevent lookahead bias.
+    Resamples lower timeframe OHLCV data to strict bars of the specified timeframe (e.g., '15min', '30min', '1H').
+    Drops any incomplete bars to prevent lookahead bias.
     """
     df = df.copy()
     if 'datetime' in df.columns:
@@ -64,41 +64,58 @@ def resample_to_1h(df: pd.DataFrame) -> pd.DataFrame:
         "volume": "sum"
     }
 
-    # Resample strictly to 1H, labeled by the left boundary (e.g., 00:00-00:59 is labeled 00:00)
-    hourly = df.resample("1H", label="left", closed="left").agg(agg_rules)
+    # Resample strictly to the target timeframe, labeled by the left boundary
+    # In pandas, '1H' works for hours, '15min' for 15 minutes, etc.
+    if timeframe == '1H':
+        pandas_tf = '1H'
+        expected_bars = 12 # 12 * 5min = 1H
+    elif timeframe == '30min':
+        pandas_tf = '30min'
+        expected_bars = 6
+    elif timeframe == '15min':
+        pandas_tf = '15min'
+        expected_bars = 3
+    else:
+        raise ValueError(f"Unsupported timeframe: {timeframe}")
 
-    # Count the number of source bars per hour to drop incomplete hours
-    # (assuming 5m data, a complete hour should have 12 bars)
-    bar_counts = df['close'].resample("1H", label="left", closed="left").count()
+    resampled = df.resample(pandas_tf, label="left", closed="left").agg(agg_rules)
+
+    # Count the number of source bars per resampled bar to drop incomplete ones
+    bar_counts = df['close'].resample(pandas_tf, label="left", closed="left").count()
     
-    # Keep the hour if it has ANY data, but we drop rows with NaNs.
-    # Note: If an hour has 0 bars, dropna removes it.
-    hourly = hourly.dropna(subset=["open", "high", "low", "close"])
+    # Keep the bar if it has ANY data, but we drop rows with NaNs.
+    resampled = resampled.dropna(subset=["open", "high", "low", "close"])
     
     # Add the source bar count for reconciliation
-    hourly['source_bar_count'] = bar_counts
+    resampled['source_bar_count'] = bar_counts
     
-    # Flag low confidence hours (e.g., fewer than 10 out of 12 5-min bars)
-    hourly['is_low_confidence'] = hourly['source_bar_count'] < 10
+    # Flag low confidence bars (missing too many source 5m bars)
+    min_required = int(expected_bars * 0.8) # 80% of expected bars required
+    resampled['is_low_confidence'] = resampled['source_bar_count'] < min_required
 
-    return hourly.reset_index()
+    return resampled.reset_index()
 
-def reconcile_resample(source_df: pd.DataFrame, hourly_df: pd.DataFrame) -> bool:
+def reconcile_resample(source_df: pd.DataFrame, resampled_df: pd.DataFrame, timeframe: str) -> bool:
     """
     Cross-validates a random 1hr bar by manually aggregating the source data.
     """
-    if len(hourly_df) == 0:
+    if len(resampled_df) == 0:
         return False
         
-    # Pick a random hour that has full data
-    valid_hours = hourly_df[hourly_df['is_low_confidence'] == False]
-    if len(valid_hours) == 0:
-        sample_hour = hourly_df.iloc[len(hourly_df) // 2]['timestamp']
+    # Pick a random bar that has full data
+    valid_bars = resampled_df[resampled_df['is_low_confidence'] == False]
+    if len(valid_bars) == 0:
+        sample_time = resampled_df.iloc[len(resampled_df) // 2]['timestamp']
     else:
-        sample_hour = valid_hours.sample(1).iloc[0]['timestamp']
+        sample_time = valid_bars.sample(1).iloc[0]['timestamp']
         
-    window_start = sample_hour
-    window_end = sample_hour + pd.Timedelta(hours=1)
+    window_start = sample_time
+    if timeframe == '1H':
+        window_end = sample_time + pd.Timedelta(hours=1)
+    elif timeframe == '30min':
+        window_end = sample_time + pd.Timedelta(minutes=30)
+    elif timeframe == '15min':
+        window_end = sample_time + pd.Timedelta(minutes=15)
     
     if 'datetime' in source_df.columns:
         source_ts = pd.to_datetime(source_df["datetime"])
@@ -116,7 +133,7 @@ def reconcile_resample(source_df: pd.DataFrame, hourly_df: pd.DataFrame) -> bool
     expected_close = source_slice.iloc[-1]["close"]
     expected_vol = source_slice["volume"].sum()
     
-    actual = hourly_df[hourly_df["timestamp"] == sample_hour].iloc[0]
+    actual = resampled_df[resampled_df["timestamp"] == sample_time].iloc[0]
     
     match = (
         np.isclose(expected_open, actual["open"]) and
@@ -126,11 +143,11 @@ def reconcile_resample(source_df: pd.DataFrame, hourly_df: pd.DataFrame) -> bool
         np.isclose(expected_vol, actual["volume"])
     )
     
-        if not match:
-            logger.warning(f"Reconciliation FAILED for {sample_hour}")
-            logger.warning(f"Expected: O={expected_open}, H={expected_high}, L={expected_low}, C={expected_close}, V={expected_vol}")
-            logger.warning(f"Actual:   O={actual['open']}, H={actual['high']}, L={actual['low']}, C={actual['close']}, V={actual['volume']}")
-        return match
+    if not match:
+        logger.warning(f"Reconciliation FAILED for {sample_time}")
+        logger.warning(f"Expected: O={expected_open}, H={expected_high}, L={expected_low}, C={expected_close}, V={expected_vol}")
+        logger.warning(f"Actual:   O={actual['open']}, H={actual['high']}, L={actual['low']}, C={actual['close']}, V={actual['volume']}")
+    return match
 
 def run_pipeline():
     files = glob.glob("*_5min_*.csv")
@@ -149,21 +166,25 @@ def run_pipeline():
         for k, v in report.items():
             logger.debug(f"  {k}: {v}")
             
-        logger.info(f"Resampling {f} to 1hr...")
-        hourly_df = resample_to_1h(df)
-        
-        # Reconciliation
-        passed = reconcile_resample(df, hourly_df)
-        logger.info(f"  Reconciliation Check: {'PASS' if passed else 'FAIL'}")
-        
-        # Save output
-        out_name = f.replace("5min", "1H")
-        # Save only the required columns to match expected engine format
-        save_df = hourly_df[['timestamp', 'open', 'high', 'low', 'close', 'volume', 'source_bar_count', 'is_low_confidence']].copy()
-        # Rename timestamp back to datetime for the indicators library expectations
-        save_df = save_df.rename(columns={'timestamp': 'datetime'})
-        save_df.to_csv(out_name, index=False)
-        logger.info(f"  Saved {out_name}\n")
+        target_tfs = ['15min', '30min', '1H']
+        for tf in target_tfs:
+            out_name = f.replace("5min", tf)
+            if os.path.exists(out_name):
+                logger.info(f"  Skipping {tf} for {f} (already exists).")
+                continue
+                
+            logger.info(f"  Resampling {f} to {tf}...")
+            resampled_df = resample_data(df, tf)
+            
+            # Reconciliation
+            passed = reconcile_resample(df, resampled_df, tf)
+            logger.info(f"  Reconciliation Check ({tf}): {'PASS' if passed else 'FAIL'}")
+            
+            # Save output
+            save_df = resampled_df[['timestamp', 'open', 'high', 'low', 'close', 'volume', 'source_bar_count', 'is_low_confidence']].copy()
+            save_df = save_df.rename(columns={'timestamp': 'datetime'})
+            save_df.to_csv(out_name, index=False)
+            logger.info(f"  Saved {out_name}\n")
         
     # Write validation report to file
     report_df = pd.DataFrame(reports)
