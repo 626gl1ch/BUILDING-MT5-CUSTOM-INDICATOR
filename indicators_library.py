@@ -5,6 +5,7 @@ All calculations are vectorized, numerically stable, and avoid lookahead bias.
 
 import pandas as pd
 import numpy as np
+from advanced_indicators import add_advanced_indicators
 
 # ==========================================
 # CATEGORY 1: MOVING AVERAGES
@@ -744,6 +745,9 @@ def add_all_indicators(df):
     res['doji'] = calc_doji_score(res)
     res['engulfing'] = calc_engulfing(res)
     res['pin_bar'] = calc_pin_bar_score(res)
+    
+    # 9. Phase 3 Advanced Indicators (DSP, Fractals, ML)
+    res = add_advanced_indicators(res)
     
     # Clean NaN/Inf values
     res = res.replace([np.inf, -np.inf], np.nan)

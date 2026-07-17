@@ -10,6 +10,7 @@ sys.path.insert(0, os.path.abspath('.'))
 from indicators_library import add_all_indicators
 from backtest_core import BacktestCore
 from rbo_v2 import GRIDS, STRATEGY_DESCRIPTIONS
+from knowledge_base import StrategyKnowledgeBase
 from logger_config import logger
 
 def get_param_combos(param_dict, max_combos=5000):
@@ -48,11 +49,11 @@ def main():
             precomputed[tf][sym] = add_all_indicators(df)
     logger.info(f"  Done in {time.time() - t0:.0f}s")
 
-    target_strategies = ['ema_pullback', 'donchian_breakout', 'bb_vwap_mr', 'rsi_divergence', 'squeeze_breakout']
+    target_strategies = list(GRIDS.keys())
     
     tasks = []
     for stype in target_strategies:
-        combos = get_param_combos(GRIDS[stype]['params'], max_combos=2000) # 2000 combos per strategy = 10,000 total
+        combos = get_param_combos(GRIDS[stype]['params']) # Removed max_combos limit
         for c in combos:
             tasks.append((stype, c))
             
@@ -66,7 +67,16 @@ def main():
     n_tested = 0
     total_found = 0
     
+    # Initialize the ML Knowledge Base
+    kb = StrategyKnowledgeBase()
+    skipped_count = 0
+    
     for stype, c in tasks:
+        # Pre-filter using ML Knowledge Base
+        if kb.has_been_tested(c):
+            skipped_count += 1
+            continue
+            
         n_tested += 1
         fn = GRIDS[stype]['fn']
         
@@ -79,6 +89,9 @@ def main():
                 precomputed['SYNTHETIC'], fn, c,
                 min_trades_per_day=0.2, min_assets=2, n_permutations=200
             )
+            
+            # Log the result to the Strategy Learning Database
+            kb.log_result(c, synth_res, synth_res['passed'])
             
             if synth_res['passed']:
                 is_god = True

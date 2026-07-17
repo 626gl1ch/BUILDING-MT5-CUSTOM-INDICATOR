@@ -48,12 +48,12 @@ class BacktestCore:
     # CORE BACKTEST ENGINE
     # ─────────────────────────────────────────────────
 
-    def run_backtest(self, df, signals, sl_atr=2.0, tp_atr=4.0, max_bars_hold=48, slippage_pct=0.0002, fee_pct=0.0005):
+    def run_backtest(self, df, signals, sl_atr=2.0, tp_atr=4.0, max_bars_hold=48, slippage_pct=0.0002, fee_pct=0.0005, risk_pct=0.02, trailing=False):
         """
-        Runs a percentage-based backtest.
-        - Signals generated at close[i] → entry at open[i+1]
-        - SL/TP checked on subsequent bars
-        - Risk = risk_pct of current capital per trade
+        Runs a backtest using Volatility Targeting (Carver) and Optimal f proxies.
+        - Entry at open[i+1]
+        - Position Size = (Capital * risk_pct) / entry_atr
+        - Optional Trailing Stop logic.
         """
         if 'atr_14' not in df.columns:
             h_l = df['high'] - df['low']
@@ -97,7 +97,18 @@ class BacktestCore:
                 exit_idx = min(entry_idx + max_bars_hold - 1, n_bars - 1)
                 exit_reason = "TIME"
 
+                # Carver Volatility Targeting: Size position so 1 ATR move = Target Dollar Risk
+                target_dollar_risk = capital * risk_pct
+                position_size_units = target_dollar_risk / sl_dist if sl_dist > 0 else 0
+                
+                # Trailing Stop Implementation
                 for j in range(entry_idx, min(entry_idx + max_bars_hold, n_bars)):
+                    if trailing:
+                        if direction == 1:
+                            sl_level = max(sl_level, high[j] - sl_dist)
+                        else:
+                            sl_level = min(sl_level, low[j] + sl_dist)
+
                     if direction == 1:
                         if low[j] <= sl_level:
                             exit_idx = j; exit_reason = "SL"; break
@@ -117,15 +128,16 @@ class BacktestCore:
                     exit_pr = close[exit_idx]
 
                 bars_held = exit_idx - entry_idx + 1
-                stop_dist_pct = abs(entry_pr - sl_level) / entry_pr
-                if stop_dist_pct <= 0:
-                    stop_dist_pct = 0.001
 
-                raw_return = (exit_pr - entry_pr) / entry_pr * direction
-                # Subtract fees and slippage on both entry and exit (2x fee, 2x slippage)
-                net_return = raw_return - (2 * fee_pct) - (2 * slippage_pct)
-                trade_pnl = capital * self.risk_pct * (net_return / stop_dist_pct)
+                raw_return_dollars = (exit_pr - entry_pr) * direction * position_size_units
+                # Subtract fees and slippage on full position notional
+                notional_value = entry_pr * position_size_units
+                cost = notional_value * (2 * fee_pct + 2 * slippage_pct)
+                trade_pnl = raw_return_dollars - cost
                 capital += trade_pnl
+                
+                # Net percentage return for Sharpe calculations
+                net_return_pct = (trade_pnl / capital) * 100
 
                 trades.append({
                     'entry_time': times[entry_idx],
@@ -134,7 +146,7 @@ class BacktestCore:
                     'entry_price': entry_pr,
                     'exit_price': exit_pr,
                     'pnl': trade_pnl,
-                    'pnl_pct': net_return * 100,
+                    'pnl_pct': net_return_pct,
                     'bars_held': bars_held,
                     'exit_reason': exit_reason
                 })
@@ -279,7 +291,9 @@ class BacktestCore:
                 tp_atr=params.get('tp_atr', 4.0),
                 max_bars_hold=params.get('max_bars_hold', 48),
                 slippage_pct=slippage_pct,
-                fee_pct=fee_pct
+                fee_pct=fee_pct,
+                risk_pct=params.get('risk_pct', 0.02),
+                trailing=params.get('trailing', False)
             )
 
             metrics = self.calculate_metrics(trades, final_bal)
