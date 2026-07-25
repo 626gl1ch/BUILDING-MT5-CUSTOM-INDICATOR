@@ -1,0 +1,66 @@
+================================================================================
+                          THE DEMI-GOD STRATEGIES                               
+================================================================================
+
+Strictly ranked strategies that proved out-of-sample profitability across multiple assets.
+
+--------------------------------------------------------------------------------
+RANK: 128 | STRATEGY: MACD_MEAN_REVERSION
+ASSET/TIMEFRAME: SOLUSDT_1H_1year_SYNTHETIC.csv
+--------------------------------------------------------------------------------
+PERFORMANCE:
+  * OOS Profit Factor : 2.72
+  * OOS Win Rate      : 66.67%
+  * OOS Sharpe Ratio  : 1.628
+  * OOS Total Trades  : 6
+  * In-Sample PF      : 0.94
+  * In-Sample WR      : 50.00%
+SETTINGS & RULES:
+  {"sl_atr": 1.5, "tp_atr": 3.0, "max_bars_hold": 99}
+
+RULES:
+1. Price sweeps a recent 20-period swing low.
+2. MACD Histogram ticks UP from the previous bar (Momentum Shift).
+3. Choppiness Index(14) > 61.8 (Chop regime confirmed).
+
+--------------------------------------------------------------------------------
+RANK: 87 | STRATEGY: MR-F_V2_CAPITULATION
+ASSET/TIMEFRAME: TRUMPUSDT_5min_1year.csv
+--------------------------------------------------------------------------------
+PERFORMANCE:
+  * OOS Profit Factor : 1.73
+  * OOS Win Rate      : 50.00%
+  * OOS Sharpe Ratio  : 1.701
+  * OOS Total Trades  : 8
+  * In-Sample PF      : 0.57
+  * In-Sample WR      : 27.91%
+SETTINGS & RULES:
+  {"sl_atr": 2.0, "tp_atr": 3.0, "max_bars_hold": 99}
+
+RULES:
+1. BB %B drops below 0.05.
+2. ATR spikes > 1.5x rolling average.
+3. Volume spikes > 1.5x rolling average.
+4. Price makes 12-bar low, RSI diverges (makes higher low).
+5. Trigger: %B moves back above 0.10.
+
+--------------------------------------------------------------------------------
+RANK: 106 | STRATEGY: MR-H_RSI_ADX
+ASSET/TIMEFRAME: SOLUSDT_1H_1year.csv
+--------------------------------------------------------------------------------
+PERFORMANCE:
+  * OOS Profit Factor : 1.43
+  * OOS Win Rate      : 48.00%
+  * OOS Sharpe Ratio  : 1.265
+  * OOS Total Trades  : 25
+  * In-Sample PF      : 0.23
+  * In-Sample WR      : 26.67%
+SETTINGS & RULES:
+  {"sl_atr": 1.5, "tp_atr": 2.5, "max_bars_hold": 99}
+
+RULES:
+1. ADX(10) is between 12 and 25 (Choppy/Ranging).
+2. ATR is greater than its 50-period 25th percentile (Volatility is not completely dead).
+3. Choppiness Index(14) < 61.8.
+4. For Long: RSI(14) < 30 (Oversold), StochRSI K crosses above previous K, and previous StochRSI was < 15.
+5. For Short: RSI(14) > 70 (Overbought), StochRSI K crosses below previous K, and previous StochRSI was > 85.
