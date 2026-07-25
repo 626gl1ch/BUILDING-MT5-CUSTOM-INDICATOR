@@ -64,3 +64,49 @@ RULES:
 3. Choppiness Index(14) < 61.8.
 4. For Long: RSI(14) < 30 (Oversold), StochRSI K crosses above previous K, and previous StochRSI was < 15.
 5. For Short: RSI(14) > 70 (Overbought), StochRSI K crosses below previous K, and previous StochRSI was > 85.
+
+
+================================================================================
+RANK: ML_TRIAL_152 | STRATEGY: HIGHEST_PROFIT_FACTOR_TREND_FOLLOWER
+ASSET/TIMEFRAME: ALL_ASSETS_30min
+================================================================================
+PERFORMANCE (FULL AGGREGATE):
+  * Profit Factor : 1.10
+  * Win Rate      : 47.21%
+  * OOS Sharpe    : 0.156
+SETTINGS & RULES:
+  {'use_candle_color': True, 'regime': 'trend', 'use_sweep': False, 'use_poc': True, 'sl_atr': 4.6, 'tp_atr': 7.3, 'max_bars_hold': 94}
+
+LOGIC & CONDITIONS:
+1. Regime Filter: Trend. The ADX(14) must be strictly > 20.
+2. Institutional Volume (POC): Price must be strictly on the correct side of the 24-bar Volume Weighted Average (SVP POC). For Longs, Close > POC. For Shorts, Close < POC.
+3. Candlestick Confirmation: Never buy a red candle. Longs strictly require Close > Open. Shorts strictly require Close < Open.
+4. Sweeps: Disabled. This strategy is a pure momentum breakout/trend follower, not a reversal strategy.
+
+TRIGGERS & EXITS:
+1. Stop Loss: 4.6 * ATR(14) (Extremely wide to survive crypto noise).
+2. Take Profit: 7.3 * ATR(14) (Massive asymmetric payout).
+3. Time Stop: Force exit after holding for 94 bars.
+
+
+================================================================================
+RANK: ML_TRIAL_299 | STRATEGY: HIGHEST_WIN_RATE_SCALPER
+ASSET/TIMEFRAME: ALL_ASSETS_30min
+================================================================================
+PERFORMANCE (FULL AGGREGATE):
+  * Profit Factor : 0.93
+  * Win Rate      : 77.35%
+  * OOS Sharpe    : 0.556
+SETTINGS & RULES:
+  {'use_candle_color': True, 'regime': 'any', 'use_sweep': True, 'sweep_lookback': 46, 'use_poc': True, 'sl_atr': 4.9, 'tp_atr': 1.5, 'max_bars_hold': 84}
+
+LOGIC & CONDITIONS:
+1. Regime Filter: Any. Trades regardless of Trend or Chop.
+2. Liquidity Sweep: Price must aggressively sweep a massive 46-bar swing high/low. The candle must wick past the level but close back inside it.
+3. Institutional Volume (POC): Price must be correctly aligned with the 24-bar Volume POC.
+4. Candlestick Confirmation: Must form a reversal green candle for longs, or red candle for shorts.
+
+TRIGGERS & EXITS:
+1. Stop Loss: 4.9 * ATR(14) (Wide safety net for the scalp).
+2. Take Profit: 1.5 * ATR(14) (Tight, high-probability scalp payout).
+3. Time Stop: Force exit after holding for 84 bars.
