@@ -19,9 +19,11 @@ SETTINGS & RULES:
   {"sl_atr": 1.5, "tp_atr": 3.0, "max_bars_hold": 99}
 
 RULES:
-1. Price sweeps a recent 20-period swing low.
-2. MACD Histogram ticks UP from the previous bar (Momentum Shift).
-3. Choppiness Index(14) > 61.8 (Chop regime confirmed).
+1. Sweep (Long): Price sweeps a recent 20-period swing low (Current Low < Prev 20-bar Low AND Current Close > Prev 20-bar Low).
+   Sweep (Short): Price sweeps a recent 20-period swing high (Current High > Prev 20-bar High AND Current Close < Prev 20-bar High).
+2. Momentum (Long): MACD(12, 26, 9) Histogram ticks UP from the previous bar.
+   Momentum (Short): MACD(12, 26, 9) Histogram ticks DOWN from the previous bar.
+3. Regime: Choppiness Index(14) > 61.8 (Chop regime confirmed).
 
 --------------------------------------------------------------------------------
 RANK: 87 | STRATEGY: MR-F_V2_CAPITULATION
@@ -38,11 +40,11 @@ SETTINGS & RULES:
   {"sl_atr": 2.0, "tp_atr": 3.0, "max_bars_hold": 99}
 
 RULES:
-1. BB %B drops below 0.05.
-2. ATR spikes > 1.5x rolling average.
-3. Volume spikes > 1.5x rolling average.
-4. Price makes 12-bar low, RSI diverges (makes higher low).
-5. Trigger: %B moves back above 0.10.
+1. BB(20, 2.0) %B drops below 0.05 within the last 5 bars (Washout).
+2. ATR(14) spikes > 1.5x its 50-period rolling average.
+3. Volume spikes > 1.5x its 50-period rolling average.
+4. Price makes 12-bar low, RSI(14) diverges (makes higher low).
+5. Trigger: BB(20, 2.0) %B moves back above 0.10 on the current bar (Reclaim).
 
 --------------------------------------------------------------------------------
 RANK: 106 | STRATEGY: MR-H_RSI_ADX
@@ -79,7 +81,7 @@ SETTINGS & RULES:
 
 LOGIC & CONDITIONS:
 1. Regime Filter: Trend. The ADX(14) must be strictly > 20.
-2. Institutional Volume (POC): Price must be strictly on the correct side of the 24-bar Volume Weighted Average (SVP POC). For Longs, Close > POC. For Shorts, Close < POC.
+2. Institutional Volume (POC): Price must be strictly on the correct side of the 24-period SMA of a rolling VWAP line (SVP POC approximation). For Longs, Close > POC. For Shorts, Close < POC.
 3. Candlestick Confirmation: Never buy a red candle. Longs strictly require Close > Open. Shorts strictly require Close < Open.
 4. Sweeps: Disabled. This strategy is a pure momentum breakout/trend follower, not a reversal strategy.
 
@@ -103,10 +105,402 @@ SETTINGS & RULES:
 LOGIC & CONDITIONS:
 1. Regime Filter: Any. Trades regardless of Trend or Chop.
 2. Liquidity Sweep: Price must aggressively sweep a massive 46-bar swing high/low. The candle must wick past the level but close back inside it.
-3. Institutional Volume (POC): Price must be correctly aligned with the 24-bar Volume POC.
+3. Institutional Volume (POC): Price must be correctly aligned with the 24-period SMA of a rolling VWAP line (SVP POC approximation).
 4. Candlestick Confirmation: Must form a reversal green candle for longs, or red candle for shorts.
 
 TRIGGERS & EXITS:
 1. Stop Loss: 4.9 * ATR(14) (Wide safety net for the scalp).
 2. Take Profit: 1.5 * ATR(14) (Tight, high-probability scalp payout).
 3. Time Stop: Force exit after holding for 84 bars.
+
+================================================================================
+RANK: ML_5M_TRIAL_110 | STRATEGY: ML_GOD_MODE_5m_CAPITULATION_TRIAL_110
+ASSET/TIMEFRAME: ALL_ASSETS_5min_1year
+================================================================================
+PERFORMANCE (FULL AGGREGATE):
+  * Profit Factor : 1.5
+  * Win Rate      : 57.07%
+  * OOS Sharpe    : 0.059
+SETTINGS & RULES:
+  {'strategy_type': 'CAPITULATION', 'b_lower': 0.08593484768675398, 'b_upper': 0.9717141005995924, 'b_trigger_l': 0.17836422979202354, 'b_trigger_s': 0.827359745683392, 'vol_mult': 2.865743168007533, 'atr_mult': 2.6363239723594805, 'sl_atr': 5.5, 'tp_atr': 5.0, 'max_bars_hold': 100}
+LOGIC & CONDITIONS:
+1. Setup (Long): Bollinger Band (20, 2.0) %B drops below 0.086 within the last 5 bars.
+2. Setup (Short): Bollinger Band (20, 2.0) %B spikes above 0.972 within the last 5 bars.
+3. Volume Filter: Volume must spike > 2.87x the 50-period average.
+4. Volatility Filter: ATR(14) must spike > 2.64x the 50-period average.
+5. Trigger (Long): %B crosses back inside to > 0.178 on the current bar.
+6. Trigger (Short): %B crosses back inside to < 0.827 on the current bar.
+
+TRIGGERS & EXITS:
+1. Stop Loss: 5.5 * ATR(14)
+2. Take Profit: 5.0 * ATR(14)
+3. Time Stop: Exit after 100 bars.
+
+================================================================================
+
+================================================================================
+RANK: ML_5M_TRIAL_135 | STRATEGY: ML_GOD_MODE_5m_CAPITULATION_TRIAL_135
+ASSET/TIMEFRAME: ALL_ASSETS_5min_1year
+================================================================================
+PERFORMANCE (FULL AGGREGATE):
+  * Profit Factor : 25.72
+  * Win Rate      : 66.01%
+  * OOS Sharpe    : 7.667
+SETTINGS & RULES:
+  {'strategy_type': 'CAPITULATION', 'b_lower': 0.08450451256689742, 'b_upper': 0.9676773671115858, 'b_trigger_l': 0.19732995390919827, 'b_trigger_s': 0.8304499651572457, 'vol_mult': 2.465969014408332, 'atr_mult': 2.9659795973871916, 'sl_atr': 6.0, 'tp_atr': 4.8, 'max_bars_hold': 81}
+LOGIC & CONDITIONS:
+1. Setup (Long): Bollinger Band (20, 2.0) %B drops below 0.085 within the last 5 bars.
+2. Setup (Short): Bollinger Band (20, 2.0) %B spikes above 0.968 within the last 5 bars.
+3. Volume Filter: Volume must spike > 2.47x the 50-period average.
+4. Volatility Filter: ATR(14) must spike > 2.97x the 50-period average.
+5. Trigger (Long): %B crosses back inside to > 0.197 on the current bar.
+6. Trigger (Short): %B crosses back inside to < 0.830 on the current bar.
+
+TRIGGERS & EXITS:
+1. Stop Loss: 6.0 * ATR(14)
+2. Take Profit: 4.8 * ATR(14)
+3. Time Stop: Exit after 81 bars.
+
+================================================================================
+
+================================================================================
+RANK: ML_5M_TRIAL_161 | STRATEGY: ML_GOD_MODE_5m_CAPITULATION_TRIAL_161
+ASSET/TIMEFRAME: ALL_ASSETS_5min_1year
+================================================================================
+PERFORMANCE (FULL AGGREGATE):
+  * Profit Factor : 26.18
+  * Win Rate      : 71.49%
+  * OOS Sharpe    : 146.908
+SETTINGS & RULES:
+  {'strategy_type': 'CAPITULATION', 'b_lower': 0.0887435006347797, 'b_upper': 0.9660343650317971, 'b_trigger_l': 0.1779407925927411, 'b_trigger_s': 0.8391671221408351, 'vol_mult': 2.5234928643705445, 'atr_mult': 2.8745076491906967, 'sl_atr': 5.8, 'tp_atr': 4.4, 'max_bars_hold': 87}
+LOGIC & CONDITIONS:
+1. Setup (Long): Bollinger Band (20, 2.0) %B drops below 0.089 within the last 5 bars.
+2. Setup (Short): Bollinger Band (20, 2.0) %B spikes above 0.966 within the last 5 bars.
+3. Volume Filter: Volume must spike > 2.52x the 50-period average.
+4. Volatility Filter: ATR(14) must spike > 2.87x the 50-period average.
+5. Trigger (Long): %B crosses back inside to > 0.178 on the current bar.
+6. Trigger (Short): %B crosses back inside to < 0.839 on the current bar.
+
+TRIGGERS & EXITS:
+1. Stop Loss: 5.8 * ATR(14)
+2. Take Profit: 4.4 * ATR(14)
+3. Time Stop: Exit after 87 bars.
+
+================================================================================
+
+================================================================================
+RANK: ML_5M_TRIAL_380 | STRATEGY: ML_GOD_MODE_5m_CAPITULATION_TRIAL_380
+ASSET/TIMEFRAME: ALL_ASSETS_5min_1year
+================================================================================
+PERFORMANCE (FULL AGGREGATE):
+  * Profit Factor : 25.93
+  * Win Rate      : 63.75%
+  * OOS Sharpe    : 128.606
+SETTINGS & RULES:
+  {'strategy_type': 'CAPITULATION', 'b_lower': 0.01573401861977769, 'b_upper': 0.9053691640900657, 'b_trigger_l': 0.18394286554097136, 'b_trigger_s': 0.8561607467712693, 'vol_mult': 2.784978607894761, 'atr_mult': 2.779498800492391, 'sl_atr': 4.5, 'tp_atr': 3.9, 'max_bars_hold': 95}
+LOGIC & CONDITIONS:
+1. Setup (Long): Bollinger Band (20, 2.0) %B drops below 0.016 within the last 5 bars.
+2. Setup (Short): Bollinger Band (20, 2.0) %B spikes above 0.905 within the last 5 bars.
+3. Volume Filter: Volume must spike > 2.78x the 50-period average.
+4. Volatility Filter: ATR(14) must spike > 2.78x the 50-period average.
+5. Trigger (Long): %B crosses back inside to > 0.184 on the current bar.
+6. Trigger (Short): %B crosses back inside to < 0.856 on the current bar.
+
+TRIGGERS & EXITS:
+1. Stop Loss: 4.5 * ATR(14)
+2. Take Profit: 3.9 * ATR(14)
+3. Time Stop: Exit after 95 bars.
+
+================================================================================
+
+================================================================================
+RANK: ML_5M_TRIAL_398 | STRATEGY: ML_GOD_MODE_5m_CAPITULATION_TRIAL_398
+ASSET/TIMEFRAME: ALL_ASSETS_5min_1year
+================================================================================
+PERFORMANCE (FULL AGGREGATE):
+  * Profit Factor : 103.41
+  * Win Rate      : 60.27%
+  * OOS Sharpe    : 80.962
+SETTINGS & RULES:
+  {'strategy_type': 'CAPITULATION', 'b_lower': 0.022856045465724326, 'b_upper': 0.9027539828162178, 'b_trigger_l': 0.17766006089780167, 'b_trigger_s': 0.8770461854898064, 'vol_mult': 2.81629468260803, 'atr_mult': 2.678978532837026, 'sl_atr': 3.2, 'tp_atr': 2.6, 'max_bars_hold': 97}
+LOGIC & CONDITIONS:
+1. Setup (Long): Bollinger Band (20, 2.0) %B drops below 0.023 within the last 5 bars.
+2. Setup (Short): Bollinger Band (20, 2.0) %B spikes above 0.903 within the last 5 bars.
+3. Volume Filter: Volume must spike > 2.82x the 50-period average.
+4. Volatility Filter: ATR(14) must spike > 2.68x the 50-period average.
+5. Trigger (Long): %B crosses back inside to > 0.178 on the current bar.
+6. Trigger (Short): %B crosses back inside to < 0.877 on the current bar.
+
+TRIGGERS & EXITS:
+1. Stop Loss: 3.2 * ATR(14)
+2. Take Profit: 2.6 * ATR(14)
+3. Time Stop: Exit after 97 bars.
+
+================================================================================
+
+================================================================================
+RANK: ML_5M_TRIAL_444 | STRATEGY: ML_GOD_MODE_5m_CAPITULATION_TRIAL_444
+ASSET/TIMEFRAME: ALL_ASSETS_5min_1year
+================================================================================
+PERFORMANCE (FULL AGGREGATE):
+  * Profit Factor : 23.26
+  * Win Rate      : 62.8%
+  * OOS Sharpe    : 88.698
+SETTINGS & RULES:
+  {'strategy_type': 'CAPITULATION', 'b_lower': 0.018790292100558298, 'b_upper': 0.906889747200172, 'b_trigger_l': 0.18141184157497098, 'b_trigger_s': 0.873618142273612, 'vol_mult': 2.8311448788356093, 'atr_mult': 2.743037570782119, 'sl_atr': 3.6, 'tp_atr': 2.8, 'max_bars_hold': 94}
+LOGIC & CONDITIONS:
+1. Setup (Long): Bollinger Band (20, 2.0) %B drops below 0.019 within the last 5 bars.
+2. Setup (Short): Bollinger Band (20, 2.0) %B spikes above 0.907 within the last 5 bars.
+3. Volume Filter: Volume must spike > 2.83x the 50-period average.
+4. Volatility Filter: ATR(14) must spike > 2.74x the 50-period average.
+5. Trigger (Long): %B crosses back inside to > 0.181 on the current bar.
+6. Trigger (Short): %B crosses back inside to < 0.874 on the current bar.
+
+TRIGGERS & EXITS:
+1. Stop Loss: 3.6 * ATR(14)
+2. Take Profit: 2.8 * ATR(14)
+3. Time Stop: Exit after 94 bars.
+
+================================================================================
+
+================================================================================
+RANK: ML_5M_TRIAL_465 | STRATEGY: ML_GOD_MODE_5m_CAPITULATION_TRIAL_465
+ASSET/TIMEFRAME: ALL_ASSETS_5min_1year
+================================================================================
+PERFORMANCE (FULL AGGREGATE):
+  * Profit Factor : 5.48
+  * Win Rate      : 56.67%
+  * OOS Sharpe    : 0.322
+SETTINGS & RULES:
+  {'strategy_type': 'CAPITULATION', 'b_lower': 0.020906347386301344, 'b_upper': 0.9073630001419958, 'b_trigger_l': 0.17000367636214364, 'b_trigger_s': 0.8713142821917599, 'vol_mult': 2.8995979151960567, 'atr_mult': 2.798085198233891, 'sl_atr': 2.5, 'tp_atr': 3.3, 'max_bars_hold': 98}
+LOGIC & CONDITIONS:
+1. Setup (Long): Bollinger Band (20, 2.0) %B drops below 0.021 within the last 5 bars.
+2. Setup (Short): Bollinger Band (20, 2.0) %B spikes above 0.907 within the last 5 bars.
+3. Volume Filter: Volume must spike > 2.90x the 50-period average.
+4. Volatility Filter: ATR(14) must spike > 2.80x the 50-period average.
+5. Trigger (Long): %B crosses back inside to > 0.170 on the current bar.
+6. Trigger (Short): %B crosses back inside to < 0.871 on the current bar.
+
+TRIGGERS & EXITS:
+1. Stop Loss: 2.5 * ATR(14)
+2. Take Profit: 3.3 * ATR(14)
+3. Time Stop: Exit after 98 bars.
+
+================================================================================
+
+================================================================================
+RANK: ML_5M_TRIAL_470 | STRATEGY: ML_GOD_MODE_5m_CAPITULATION_TRIAL_470
+ASSET/TIMEFRAME: ALL_ASSETS_5min_1year
+================================================================================
+PERFORMANCE (FULL AGGREGATE):
+  * Profit Factor : 25.97
+  * Win Rate      : 69.5%
+  * OOS Sharpe    : 0.74
+SETTINGS & RULES:
+  {'strategy_type': 'CAPITULATION', 'b_lower': 0.02498277042742109, 'b_upper': 0.9016130125835979, 'b_trigger_l': 0.17911738343412076, 'b_trigger_s': 0.886522476009596, 'vol_mult': 2.8633107947919196, 'atr_mult': 2.729696808247472, 'sl_atr': 3.7, 'tp_atr': 3.1, 'max_bars_hold': 93}
+LOGIC & CONDITIONS:
+1. Setup (Long): Bollinger Band (20, 2.0) %B drops below 0.025 within the last 5 bars.
+2. Setup (Short): Bollinger Band (20, 2.0) %B spikes above 0.902 within the last 5 bars.
+3. Volume Filter: Volume must spike > 2.86x the 50-period average.
+4. Volatility Filter: ATR(14) must spike > 2.73x the 50-period average.
+5. Trigger (Long): %B crosses back inside to > 0.179 on the current bar.
+6. Trigger (Short): %B crosses back inside to < 0.887 on the current bar.
+
+TRIGGERS & EXITS:
+1. Stop Loss: 3.7 * ATR(14)
+2. Take Profit: 3.1 * ATR(14)
+3. Time Stop: Exit after 93 bars.
+
+================================================================================
+
+================================================================================
+RANK: ML_15MIN_TRIAL_36 | STRATEGY: ML_GOD_MODE_15min_RSI_ADX_CHOP_TRIAL_36
+ASSET/TIMEFRAME: ALL_ASSETS_15min_1year
+================================================================================
+PERFORMANCE (FULL AGGREGATE):
+  * Profit Factor : 1.2
+  * Win Rate      : 76.81%
+  * OOS Sharpe    : 18.718
+SETTINGS & RULES:
+  {'strategy_type': 'RSI_ADX_CHOP', 'adx_min': 19.69767907099042, 'adx_max': 21.165378199473135, 'chop_max': 50.383307068869925, 'rsi_os': 20.904610087913703, 'rsi_ob': 60.08538383263414, 'sl_atr': 4.8, 'tp_atr': 1.6, 'max_bars_hold': 46}
+
+LOGIC & CONDITIONS:
+1. Regime: ADX(14) between 19.7 and 21.2.
+2. Regime: Choppiness Index (14) < 50.4.
+3. Momentum (Long): RSI(14) < 20.9 AND StochRSI(14, 3, 3) (K is a 3-period SMA of raw stochastic, D is a 3-period SMA of K) %K crosses above %D.
+4. Momentum (Short): RSI(14) > 60.1 AND StochRSI(14, 3, 3) (K is a 3-period SMA of raw stochastic, D is a 3-period SMA of K) %K crosses below %D.
+
+TRIGGERS & EXITS:
+1. Stop Loss: 4.8 * ATR(14)
+2. Take Profit: 1.6 * ATR(14)
+3. Time Stop: Exit after 46 bars.
+================================================================================
+
+================================================================================
+RANK: ML_15MIN_TRIAL_53 | STRATEGY: ML_GOD_MODE_15min_CAPITULATION_TRIAL_53
+ASSET/TIMEFRAME: ALL_ASSETS_15min_1year
+================================================================================
+PERFORMANCE (FULL AGGREGATE):
+  * Profit Factor : 50.45
+  * Win Rate      : 84.72%
+  * OOS Sharpe    : 1.925
+SETTINGS & RULES:
+  {'strategy_type': 'CAPITULATION', 'b_lower': 0.011111154688176654, 'b_upper': 0.9097932832017517, 'b_trigger_l': 0.15963711345020518, 'b_trigger_s': 0.9465294697536112, 'vol_mult': 2.9875554930468597, 'atr_mult': 2.3503857760575806, 'sl_atr': 2.2, 'tp_atr': 1.4, 'max_bars_hold': 25}
+LOGIC & CONDITIONS:
+1. Setup (Long): Bollinger Band (20, 2.0) %B drops below 0.011 within the last 5 bars.
+2. Setup (Short): Bollinger Band (20, 2.0) %B spikes above 0.910 within the last 5 bars.
+3. Volume Filter: Volume must spike > 2.99x the 50-period average.
+4. Volatility Filter: ATR(14) must spike > 2.35x the 50-period average.
+5. Trigger (Long): %B crosses back inside to > 0.160 on the current bar.
+6. Trigger (Short): %B crosses back inside to < 0.947 on the current bar.
+
+TRIGGERS & EXITS:
+1. Stop Loss: 2.2 * ATR(14)
+2. Take Profit: 1.4 * ATR(14)
+3. Time Stop: Exit after 25 bars.
+
+
+LOGIC & CONDITIONS:
+1. Setup (Long): Bollinger Band (20, 2.0) %B drops below 0.011 within the last 5 bars.
+2. Setup (Short): Bollinger Band (20, 2.0) %B spikes above 0.910 within the last 5 bars.
+3. Volume Filter: Volume must spike > 2.99x the 50-period average.
+4. Volatility Filter: ATR(14) must spike > 2.35x the 50-period average.
+5. Trigger (Long): %B crosses back inside to > 0.160.
+6. Trigger (Short): %B crosses back inside to < 0.947.
+
+TRIGGERS & EXITS:
+1. Stop Loss: 2.2 * ATR(14)
+2. Take Profit: 1.4 * ATR(14)
+3. Time Stop: Exit after 25 bars.
+================================================================================
+
+================================================================================
+RANK: ML_15MIN_TRIAL_191 | STRATEGY: ML_GOD_MODE_15min_CAPITULATION_TRIAL_191
+ASSET/TIMEFRAME: ALL_ASSETS_15min_1year
+================================================================================
+PERFORMANCE (FULL AGGREGATE):
+  * Profit Factor : 25.52
+  * Win Rate      : 79.52%
+  * OOS Sharpe    : 12.128
+SETTINGS & RULES:
+  {'strategy_type': 'CAPITULATION', 'b_lower': 0.0734113065043585, 'b_upper': 0.9636093176431357, 'b_trigger_l': 0.07498984816733249, 'b_trigger_s': 0.8941348808527821, 'vol_mult': 2.681570163914783, 'atr_mult': 2.4499612242183324, 'sl_atr': 1.1, 'tp_atr': 0.5, 'max_bars_hold': 82}
+LOGIC & CONDITIONS:
+1. Setup (Long): Bollinger Band (20, 2.0) %B drops below 0.073 within the last 5 bars.
+2. Setup (Short): Bollinger Band (20, 2.0) %B spikes above 0.964 within the last 5 bars.
+3. Volume Filter: Volume must spike > 2.68x the 50-period average.
+4. Volatility Filter: ATR(14) must spike > 2.45x the 50-period average.
+5. Trigger (Long): %B crosses back inside to > 0.075 on the current bar.
+6. Trigger (Short): %B crosses back inside to < 0.894 on the current bar.
+
+TRIGGERS & EXITS:
+1. Stop Loss: 1.1 * ATR(14)
+2. Take Profit: 0.5 * ATR(14)
+3. Time Stop: Exit after 82 bars.
+
+
+LOGIC & CONDITIONS:
+1. Setup (Long): Bollinger Band (20, 2.0) %B drops below 0.073 within the last 5 bars.
+2. Setup (Short): Bollinger Band (20, 2.0) %B spikes above 0.964 within the last 5 bars.
+3. Volume Filter: Volume must spike > 2.68x the 50-period average.
+4. Volatility Filter: ATR(14) must spike > 2.45x the 50-period average.
+5. Trigger (Long): %B crosses back inside to > 0.075.
+6. Trigger (Short): %B crosses back inside to < 0.894.
+
+TRIGGERS & EXITS:
+1. Stop Loss: 1.1 * ATR(14)
+2. Take Profit: 0.5 * ATR(14)
+3. Time Stop: Exit after 82 bars.
+================================================================================
+
+================================================================================
+RANK: ML_30MIN_TRIAL_55 | STRATEGY: ML_GOD_MODE_30min_RSI_ADX_CHOP_TRIAL_55
+ASSET/TIMEFRAME: ALL_ASSETS_30min_1year
+================================================================================
+PERFORMANCE (FULL AGGREGATE):
+  * Profit Factor : 2.45
+  * Win Rate      : 62.32%
+  * OOS Sharpe    : 1.101
+SETTINGS & RULES:
+  {'strategy_type': 'RSI_ADX_CHOP', 'adx_min': 6.0101293502820266, 'adx_max': 22.772472701519778, 'chop_max': 66.59431090665474, 'rsi_os': 24.676134053295375, 'rsi_ob': 72.67077682325252, 'sl_atr': 4.6, 'tp_atr': 2.7, 'max_bars_hold': 41}
+
+LOGIC & CONDITIONS:
+1. Regime: ADX(14) between 6.0 and 22.8.
+2. Regime: Choppiness Index (14) < 66.6.
+3. Momentum (Long): RSI(14) < 24.7 AND StochRSI(14, 3, 3) (K is a 3-period SMA of raw stochastic, D is a 3-period SMA of K) %K crosses above %D.
+4. Momentum (Short): RSI(14) > 72.7 AND StochRSI(14, 3, 3) (K is a 3-period SMA of raw stochastic, D is a 3-period SMA of K) %K crosses below %D.
+
+TRIGGERS & EXITS:
+1. Stop Loss: 4.6 * ATR(14)
+2. Take Profit: 2.7 * ATR(14)
+3. Time Stop: Exit after 41 bars.
+================================================================================
+
+================================================================================
+RANK: ML_30MIN_TRIAL_101 | STRATEGY: ML_GOD_MODE_30min_RSI_ADX_CHOP_TRIAL_101
+ASSET/TIMEFRAME: ALL_ASSETS_30min_1year
+================================================================================
+PERFORMANCE (FULL AGGREGATE):
+  * Profit Factor : 50.06
+  * Win Rate      : 91.94%
+  * OOS Sharpe    : 36.787
+SETTINGS & RULES:
+  {'strategy_type': 'RSI_ADX_CHOP', 'adx_min': 10.828171012331541, 'adx_max': 22.639330558652908, 'chop_max': 60.92738614041457, 'rsi_os': 27.176789400993083, 'rsi_ob': 77.01019133464486, 'sl_atr': 4.0, 'tp_atr': 0.6, 'max_bars_hold': 47}
+
+LOGIC & CONDITIONS:
+1. Regime: ADX(14) between 10.8 and 22.6.
+2. Regime: Choppiness Index (14) < 60.9.
+3. Momentum (Long): RSI(14) < 27.2 AND StochRSI(14, 3, 3) (K is a 3-period SMA of raw stochastic, D is a 3-period SMA of K) %K crosses above %D.
+4. Momentum (Short): RSI(14) > 77.0 AND StochRSI(14, 3, 3) (K is a 3-period SMA of raw stochastic, D is a 3-period SMA of K) %K crosses below %D.
+
+TRIGGERS & EXITS:
+1. Stop Loss: 4.0 * ATR(14)
+2. Take Profit: 0.6 * ATR(14)
+3. Time Stop: Exit after 47 bars.
+================================================================================
+
+================================================================================
+RANK: ML_30MIN_TRIAL_157 | STRATEGY: ML_GOD_MODE_30min_MACD_REV_TRIAL_157
+ASSET/TIMEFRAME: ALL_ASSETS_30min_1year
+================================================================================
+PERFORMANCE (FULL AGGREGATE):
+  * Profit Factor : 1.55
+  * Win Rate      : 69.65%
+  * OOS Sharpe    : 88.563
+SETTINGS & RULES:
+  {'strategy_type': 'MACD_REV', 'chop_thresh': 64.85457147589987, 'sweep_lookback': 23, 'sl_atr': 2.2, 'tp_atr': 1.5, 'max_bars_hold': 48}
+
+LOGIC & CONDITIONS:
+1. Sweep (Long): Price sweeps a recent 23-bar swing low (Current Low < Prev 23-bar Low AND Current Close > Prev 23-bar Low).
+   Sweep (Short): Price sweeps a recent 23-bar swing high (Current High > Prev 23-bar High AND Current Close < Prev 23-bar High).
+2. Momentum (Long): MACD(12, 26, 9) Histogram ticks UP from the previous bar.
+   Momentum (Short): MACD(12, 26, 9) Histogram ticks DOWN from the previous bar.
+3. Regime: Choppiness Index (14) must be > 64.9 (Ranging/Choppy market).
+
+TRIGGERS & EXITS:
+1. Stop Loss: 2.2 * ATR(14)
+2. Take Profit: 1.5 * ATR(14)
+3. Time Stop: Exit after 48 bars.
+================================================================================
+
+================================================================================
+RANK: ML_30MIN_TRIAL_278 | STRATEGY: ML_GOD_MODE_30min_RSI_ADX_CHOP_TRIAL_278
+ASSET/TIMEFRAME: ALL_ASSETS_30min_1year
+================================================================================
+PERFORMANCE (FULL AGGREGATE):
+  * Profit Factor : 1.21
+  * Win Rate      : 55.72%
+  * OOS Sharpe    : 1168.843
+SETTINGS & RULES:
+  {'strategy_type': 'RSI_ADX_CHOP', 'adx_min': 15.802239037241096, 'adx_max': 23.16197079853464, 'chop_max': 61.96551857993552, 'rsi_os': 29.444471999204286, 'rsi_ob': 78.16935248853791, 'sl_atr': 2.7, 'tp_atr': 2.7, 'max_bars_hold': 61}
+
+LOGIC & CONDITIONS:
+1. Regime: ADX(14) between 15.8 and 23.2.
+2. Regime: Choppiness Index (14) < 62.0.
+3. Momentum (Long): RSI(14) < 29.4 AND StochRSI(14, 3, 3) (K is a 3-period SMA of raw stochastic, D is a 3-period SMA of K) %K crosses above %D.
+4. Momentum (Short): RSI(14) > 78.2 AND StochRSI(14, 3, 3) (K is a 3-period SMA of raw stochastic, D is a 3-period SMA of K) %K crosses below %D.
+
+TRIGGERS & EXITS:
+1. Stop Loss: 2.7 * ATR(14)
+2. Take Profit: 2.7 * ATR(14)
+3. Time Stop: Exit after 61 bars.
+================================================================================
