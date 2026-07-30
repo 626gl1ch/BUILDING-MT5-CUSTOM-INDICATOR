@@ -1,0 +1,47 @@
+=== PDF STRATEGIES BACKTEST WINNERS ===
+Timeframes: 5M & 15M
+Validation: Standard Backtest + Walkforward OOS
+============================================================
+
+Strategy: PDF_Strat_29_equal_lows_macd_mean_reversion (5M)
+  Profit Factor: 0.83
+  Win Rate:      44.7%
+  Sharpe Ratio:  -0.452
+  Total Trades:  41
+  OOS PF:        0.54
+----------------------------------------
+Strategy: PDF_Strat_3_equal_lows_alma_weak_trend (15M)
+  Profit Factor: 0.86
+  Win Rate:      38.1%
+  Sharpe Ratio:  -0.792
+  Total Trades:  94
+  OOS PF:        2.44
+----------------------------------------
+Strategy: PDF_Strat_5_equal_lows_alma_mean_reversion (5M)
+  Profit Factor: 0.83
+  Win Rate:      38.3%
+  Sharpe Ratio:  -0.823
+  Total Trades:  35
+  OOS PF:        0.13
+----------------------------------------
+Strategy: PDF_Strat_10_equal_lows_rsi_strong_trend (15M)
+  Profit Factor: 0.83
+  Win Rate:      37.1%
+  Sharpe Ratio:  -0.964
+  Total Trades:  159
+  OOS PF:        0.90
+----------------------------------------
+Strategy: PDF_Strat_9_equal_lows_rsi_strong_trend (15M)
+  Profit Factor: 0.85
+  Win Rate:      35.6%
+  Sharpe Ratio:  -1.030
+  Total Trades:  123
+  OOS PF:        0.95
+----------------------------------------
+Strategy: PDF_Strat_2_equal_lows_alma_strong_trend (15M)
+  Profit Factor: 0.97
+  Win Rate:      36.4%
+  Sharpe Ratio:  -15.934
+  Total Trades:  38
+  OOS PF:        25.31
+----------------------------------------

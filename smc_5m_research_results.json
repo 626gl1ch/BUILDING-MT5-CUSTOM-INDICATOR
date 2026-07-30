@@ -1,0 +1,246 @@
+[
+  {
+    "name": "1. Baseline SMC",
+    "params": {
+      "lookback": 20,
+      "sl_atr": 0.5,
+      "tp_atr": 2.0,
+      "max_bars_hold": 999,
+      "trailing": true
+    },
+    "backtest": {
+      "total_trades": 7243,
+      "active_symbols": 4,
+      "expectancy": -5.7025,
+      "trades_per_day": 4.97,
+      "sharpe_ratio": -43.236,
+      "profit_factor": 0.07,
+      "win_rate": 11.37
+    },
+    "walkforward": {
+      "in_sample": {
+        "total_trades": 5150,
+        "active_symbols": 4,
+        "expectancy": -7.9894,
+        "trades_per_day": 5.07,
+        "sharpe_ratio": -42.189,
+        "profit_factor": 0.07,
+        "win_rate": 12.01
+      },
+      "out_of_sample": {
+        "total_trades": 2082,
+        "active_symbols": 4,
+        "expectancy": -20.1141,
+        "trades_per_day": 4.79,
+        "sharpe_ratio": -47.761,
+        "profit_factor": 0.07,
+        "win_rate": 9.87
+      }
+    }
+  },
+  {
+    "name": "2. SMC + RSI",
+    "params": {
+      "lookback": 20,
+      "sl_atr": 0.5,
+      "tp_atr": 2.0,
+      "rsi_os": 40,
+      "rsi_ob": 60,
+      "max_bars_hold": 999,
+      "trailing": true
+    },
+    "backtest": {
+      "total_trades": 3799,
+      "active_symbols": 4,
+      "expectancy": -10.8858,
+      "trades_per_day": 2.61,
+      "sharpe_ratio": -32.504,
+      "profit_factor": 0.11,
+      "win_rate": 11.36
+    },
+    "walkforward": {
+      "in_sample": {
+        "total_trades": 2659,
+        "active_symbols": 4,
+        "expectancy": -15.4336,
+        "trades_per_day": 2.62,
+        "sharpe_ratio": -30.337,
+        "profit_factor": 0.11,
+        "win_rate": 12.59
+      },
+      "out_of_sample": {
+        "total_trades": 1133,
+        "active_symbols": 4,
+        "expectancy": -37.3057,
+        "trades_per_day": 2.61,
+        "sharpe_ratio": -39.684,
+        "profit_factor": 0.04,
+        "win_rate": 8.53
+      }
+    }
+  },
+  {
+    "name": "3. SMC + StochRSI",
+    "params": {
+      "lookback": 20,
+      "sl_atr": 0.5,
+      "tp_atr": 2.0,
+      "stoch_os": 25,
+      "stoch_ob": 75,
+      "max_bars_hold": 999,
+      "trailing": true
+    },
+    "backtest": {
+      "total_trades": 3037,
+      "active_symbols": 4,
+      "expectancy": -13.6281,
+      "trades_per_day": 2.09,
+      "sharpe_ratio": -27.936,
+      "profit_factor": 0.12,
+      "win_rate": 12.04
+    },
+    "walkforward": {
+      "in_sample": {
+        "total_trades": 2178,
+        "active_symbols": 4,
+        "expectancy": -18.8807,
+        "trades_per_day": 2.15,
+        "sharpe_ratio": -26.295,
+        "profit_factor": 0.12,
+        "win_rate": 13.55
+      },
+      "out_of_sample": {
+        "total_trades": 853,
+        "active_symbols": 4,
+        "expectancy": -49.0894,
+        "trades_per_day": 1.97,
+        "sharpe_ratio": -33.94,
+        "profit_factor": 0.04,
+        "win_rate": 8.21
+      }
+    }
+  },
+  {
+    "name": "4. SMC + Volume",
+    "params": {
+      "lookback": 20,
+      "sl_atr": 0.5,
+      "tp_atr": 2.0,
+      "rvol_thresh": 1.2,
+      "max_bars_hold": 999,
+      "trailing": true
+    },
+    "backtest": {
+      "total_trades": 3505,
+      "active_symbols": 4,
+      "expectancy": -11.7002,
+      "trades_per_day": 2.41,
+      "sharpe_ratio": -27.575,
+      "profit_factor": 0.12,
+      "win_rate": 13.12
+    },
+    "walkforward": {
+      "in_sample": {
+        "total_trades": 2450,
+        "active_symbols": 4,
+        "expectancy": -16.7034,
+        "trades_per_day": 2.42,
+        "sharpe_ratio": -25.288,
+        "profit_factor": 0.12,
+        "win_rate": 14.51
+      },
+      "out_of_sample": {
+        "total_trades": 1050,
+        "active_symbols": 4,
+        "expectancy": -39.3449,
+        "trades_per_day": 2.43,
+        "sharpe_ratio": -34.684,
+        "profit_factor": 0.06,
+        "win_rate": 9.95
+      }
+    }
+  },
+  {
+    "name": "5. SMC + FVG Filter",
+    "params": {
+      "lookback": 20,
+      "sl_atr": 0.5,
+      "tp_atr": 2.0,
+      "fvg_lookback": 5,
+      "max_bars_hold": 999,
+      "trailing": true
+    },
+    "backtest": {
+      "total_trades": 3078,
+      "active_symbols": 4,
+      "expectancy": -13.4945,
+      "trades_per_day": 2.11,
+      "sharpe_ratio": -28.391,
+      "profit_factor": 0.1,
+      "win_rate": 11.11
+    },
+    "walkforward": {
+      "in_sample": {
+        "total_trades": 2156,
+        "active_symbols": 4,
+        "expectancy": -19.2118,
+        "trades_per_day": 2.12,
+        "sharpe_ratio": -28.777,
+        "profit_factor": 0.1,
+        "win_rate": 11.0
+      },
+      "out_of_sample": {
+        "total_trades": 918,
+        "active_symbols": 4,
+        "expectancy": -44.8421,
+        "trades_per_day": 2.14,
+        "sharpe_ratio": -29.639,
+        "profit_factor": 0.06,
+        "win_rate": 11.55
+      }
+    }
+  },
+  {
+    "name": "6. SMC Combined Synergy",
+    "params": {
+      "lookback": 20,
+      "sl_atr": 0.5,
+      "tp_atr": 2.5,
+      "stoch_os": 30,
+      "stoch_ob": 70,
+      "rvol_thresh": 1.1,
+      "fvg_lookback": 4,
+      "max_bars_hold": 999,
+      "trailing": true
+    },
+    "backtest": {
+      "total_trades": 571,
+      "active_symbols": 4,
+      "expectancy": -68.3766,
+      "trades_per_day": 0.4,
+      "sharpe_ratio": -11.021,
+      "profit_factor": 0.14,
+      "win_rate": 14.38
+    },
+    "walkforward": {
+      "in_sample": {
+        "total_trades": 395,
+        "active_symbols": 4,
+        "expectancy": -89.1942,
+        "trades_per_day": 0.4,
+        "sharpe_ratio": -9.479,
+        "profit_factor": 0.15,
+        "win_rate": 16.55
+      },
+      "out_of_sample": {
+        "total_trades": 101,
+        "active_symbols": 2,
+        "expectancy": -156.9352,
+        "trades_per_day": 0.48,
+        "sharpe_ratio": -16.448,
+        "profit_factor": 0.08,
+        "win_rate": 11.94
+      }
+    }
+  }
+]

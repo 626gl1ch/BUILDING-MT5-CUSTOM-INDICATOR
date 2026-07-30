@@ -1,0 +1,17 @@
+Timeframe,Strategy,PF,WR,Sharpe,Trades,wf_folds_profitable,wf_min_fold_pf
+15min,5_BB_PctB_Chop_Confluence,0.91,41.7,-0.462,113,0/5,0.0
+15min,2_StochRSI_ALMA_Pullback,0.71,40.33,-1.274,104,0/5,0.0
+15min,8_RSI_MACD_Divergence,0.68,36.39,-2.596,610,0/5,0.0
+15min,1_BB_RSI_Reversion,0.0,0.0,0.0,0,0/5,0.0
+15min,3_MACD_Hist_Fade,0.0,0.0,0.0,0,0/5,0.0
+15min,4_RSI2_Dip_Rip,0.0,0.0,0.0,0,0/5,0.0
+15min,6_Double_Oversold_Confirm,0.0,0.0,0.0,0,0/5,0.0
+15min,7_ALMA_Distance_Reversion,0.0,0.0,0.0,0,0/5,0.0
+5min,6_Double_Oversold_Confirm,0.77,44.41,-1.516,370,0/5,0.0
+5min,2_StochRSI_ALMA_Pullback,0.66,40.2,-2.454,446,0/5,0.0
+5min,5_BB_PctB_Chop_Confluence,0.58,37.58,-3.115,428,0/5,0.0
+5min,8_RSI_MACD_Divergence,0.55,36.92,-6.633,1799,0/5,0.5
+5min,1_BB_RSI_Reversion,0.0,0.0,0.0,0,0/5,0.0
+5min,3_MACD_Hist_Fade,0.0,0.0,0.0,0,0/5,0.0
+5min,4_RSI2_Dip_Rip,0.0,0.0,0.0,0,0/5,0.0
+5min,7_ALMA_Distance_Reversion,0.0,0.0,0.0,0,0/5,0.0

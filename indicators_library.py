@@ -5,6 +5,9 @@ All calculations are vectorized, numerically stable, and avoid lookahead bias.
 
 import pandas as pd
 import numpy as np
+import warnings
+from pandas.errors import PerformanceWarning
+warnings.simplefilter(action='ignore', category=PerformanceWarning)
 from advanced_indicators import add_advanced_indicators
 
 # ==========================================
@@ -443,6 +446,19 @@ def calc_garman_klass_volatility(df, period=20):
     gk = term1 - term2
     return np.sqrt(gk.rolling(period).mean() * 252 * 288)
 
+def calc_swing_points(df, lookback=20):
+    window = 2 * lookback + 1
+    roll_max = df['high'].rolling(window=window).max()
+    roll_min = df['low'].rolling(window=window).min()
+    
+    is_swing_high = (df['high'].shift(lookback) == roll_max)
+    is_swing_low = (df['low'].shift(lookback) == roll_min)
+    
+    swing_high_lvl = np.where(is_swing_high, df['high'].shift(lookback), np.nan)
+    swing_low_lvl = np.where(is_swing_low, df['low'].shift(lookback), np.nan)
+    
+    return pd.Series(swing_high_lvl, index=df.index).ffill(), pd.Series(swing_low_lvl, index=df.index).ffill()
+
 # ==========================================
 # CATEGORY 6: VOLUME INDICATORS
 # ==========================================
@@ -606,6 +622,104 @@ def calc_pin_bar_score(df):
     return pd.Series(signals, index=df.index)
 
 # ==========================================
+# CATEGORY 11: ADVANCED REGIME & VOLUME
+# ==========================================
+
+def calc_cvd(df, period=10):
+    """
+    Cumulative Volume Delta Proxy.
+    Uses volume weighted by the close relative to high-low range.
+    """
+    hl_range = df['high'] - df['low']
+    # Avoid division by zero
+    hl_range = hl_range.replace(0, 1e-8)
+    delta = df['volume'] * ((df['close'] - df['open']) / hl_range)
+    return delta.rolling(window=period).sum()
+
+def calc_bb_width_percentile(df, period=20, std=2.0, lookback=100):
+    """
+    Calculates the percentile rank of the current Bollinger Band width
+    relative to the last 'lookback' periods.
+    """
+    _, _, _, _, width = calc_bollinger_bands(df['close'], period=period, std=std)
+    # Native vectorized rolling rank
+    percentile = width.rolling(window=lookback).rank(pct=True) * 100
+    return percentile
+
+def calc_kaufman_er(series, period=10):
+    """
+    Kaufman Efficiency Ratio (ER).
+    ER = |Net Change over N| / Sum(|bar-to-bar changes| over N)
+    Range: 0 (pure noise) to 1 (pure trend).
+    """
+    net_change = series.diff(period).abs()
+    sum_abs_changes = series.diff(1).abs().rolling(window=period).sum()
+    er = net_change / sum_abs_changes.replace(0, np.nan)
+    return er.fillna(0)
+
+def calc_vwap_slope(df, period=10):
+    """
+    Slope of VWAP: VWAP[now] - VWAP[period bars ago].
+    Positive = sloping up, negative = sloping down.
+    """
+    vwap = calc_vwap(df)
+    return vwap - vwap.shift(period)
+
+def calc_mtf_supertrend(df, resample_n=3, period=10, multiplier=3.0):
+    """
+    Builds a synthetic higher-timeframe Supertrend by resampling the 5m
+    DataFrame into N-candle synthetic bars (e.g. 3 bars = synthetic 15m),
+    computing Supertrend on those synthetic bars, then forward-filling the
+    direction back to the original 5m index.
+    Only fully-closed synthetic bars are used (no look-ahead).
+    """
+    # Group candles into blocks of resample_n
+    bar_idx = np.arange(len(df))
+    synthetic_group = bar_idx // resample_n
+
+    ohlcv = df[['open', 'high', 'low', 'close', 'volume']].copy()
+    ohlcv['_g'] = synthetic_group
+
+    synthetic = ohlcv.groupby('_g').agg(
+        open=('open', 'first'),
+        high=('high', 'max'),
+        low=('low', 'min'),
+        close=('close', 'last'),
+        volume=('volume', 'sum')
+    )
+    synthetic.index = ohlcv.groupby('_g').apply(lambda x: x.index[-1])  # last 5m bar timestamp of each block
+
+    _, st_dir_synthetic = calc_supertrend(synthetic, period=period, multiplier=multiplier)
+
+    # Map back: direction is valid only after the block CLOSES (i.e. shift by 1 synthetic bar)
+    st_dir_synthetic_shifted = st_dir_synthetic.shift(1)
+
+    # Reindex to 5m, forward fill within each group
+    direction_5m = st_dir_synthetic_shifted.reindex(df.index, method='ffill')
+    return direction_5m
+
+def calc_cvd_divergence_veto(df, lookback=10):
+    """
+    Detects CVD divergence to veto false breakout entries.
+    Returns:
+      bearish_div (pd.Series bool): price HH but CVD LH → veto LONG entries
+      bullish_div (pd.Series bool): price LL but CVD HL → veto SHORT entries
+    """
+    cvd = calc_cvd(df, period=5)
+    price = df['close']
+
+    price_hh = price.rolling(lookback).max() > price.rolling(lookback).max().shift(1)
+    cvd_lh   = cvd.rolling(lookback).max()  < cvd.rolling(lookback).max().shift(1)
+    bearish_div = price_hh & cvd_lh
+
+    price_ll = price.rolling(lookback).min() < price.rolling(lookback).min().shift(1)
+    cvd_hl   = cvd.rolling(lookback).min()  > cvd.rolling(lookback).min().shift(1)
+    bullish_div = price_ll & cvd_hl
+
+    return bearish_div, bullish_div
+
+
+# ==========================================
 # COMBINED BULK LOADER
 # ==========================================
 
@@ -615,8 +729,8 @@ def add_all_indicators(df):
     """
     res = df.copy()
     
-    # 1. Moving Averages (25 indicators)
-    periods = [5, 8, 10, 13, 20, 21, 34, 50, 55, 89, 100, 144, 200]
+    # 1. Moving Averages (25+ indicators)
+    periods = [5, 8, 10, 13, 20, 21, 34, 50, 55, 89, 100, 144, 200, 600, 2400]
     for p in periods:
         res[f'sma_{p}'] = calc_sma(res['close'], p)
         res[f'ema_{p}'] = calc_ema(res['close'], p)
@@ -715,6 +829,12 @@ def add_all_indicators(df):
         res[f'donchian_lower_{p}'] = dl
         res[f'donchian_b_pct_{p}'] = db
         
+        res[f'squeeze_on_{p}'] = np.where((u < ku) & (l > kl), 1.0, 0.0)
+        
+        sh, sl = calc_swing_points(res, p)
+        res[f'swing_high_{p}'] = sh
+        res[f'swing_low_{p}'] = sl
+        
     res['hv_20'] = calc_historical_volatility(res['close'], 20)
     res['gk_vol_20'] = calc_garman_klass_volatility(res, 20)
     
@@ -749,6 +869,184 @@ def add_all_indicators(df):
     # 9. Phase 3 Advanced Indicators (DSP, Fractals, ML)
     res = add_advanced_indicators(res)
     
+
+
+    # 10. Volume Profile
+    res['svp_poc'] = calc_session_svp(res)
+    
+    # 11. SMC V2 Advanced
+    vwap_base, vwap_std = calc_vwap_stdev(res)
+    res['vwap_base'] = vwap_base
+    res['vwap_std'] = vwap_std
+    
+    ob_bull_top, ob_bull_bot, ob_bear_bot, ob_bear_top = calc_order_blocks(res)
+    res['ob_bull_top'] = ob_bull_top
+    res['ob_bull_bot'] = ob_bull_bot
+    res['ob_bear_bot'] = ob_bear_bot
+    res['ob_bear_top'] = ob_bear_top
+    
     # Clean NaN/Inf values
     res = res.replace([np.inf, -np.inf], np.nan)
-    return res
+    return res.copy()
+
+
+# ==========================================
+# CATEGORY 11: VOLUME PROFILE INDICATORS
+# ==========================================
+
+def calc_session_svp(df, rows=50):
+    '''
+    Calculates Daily Session Volume Profile and Point of Control (POC).
+    To optimize for backtesting, we group by Day, compute the profile, 
+    and use the *previous* day's POC as the directional filter for the current day.
+    '''
+    df_copy = df.copy()
+    df_copy['date_only'] = df_copy.index.date
+    
+    daily_poc = {}
+    import numpy as np
+    
+    for date, group in df_copy.groupby('date_only'):
+        min_p = group['low'].min()
+        max_p = group['high'].max()
+        
+        if max_p == min_p:
+            daily_poc[date] = min_p
+            continue
+            
+        bins = np.linspace(min_p, max_p, rows + 1)
+        vol_profile = np.zeros(rows)
+        
+        tp = (group['high'] + group['low'] + group['close']) / 3
+        bin_indices = np.digitize(tp, bins) - 1
+        bin_indices = np.clip(bin_indices, 0, rows - 1)
+        
+        for i in range(len(group)):
+            vol_profile[bin_indices[i]] += group['volume'].iloc[i]
+            
+        poc_idx = np.argmax(vol_profile)
+        poc_price = (bins[poc_idx] + bins[poc_idx+1]) / 2.0
+        daily_poc[date] = poc_price
+        
+    unique_dates = sorted(list(daily_poc.keys()))
+    shifted_poc = {unique_dates[i]: daily_poc[unique_dates[i-1]] for i in range(1, len(unique_dates))}
+    if len(unique_dates) > 0:
+        shifted_poc[unique_dates[0]] = daily_poc[unique_dates[0]] 
+        
+    poc_series = df_copy['date_only'].map(shifted_poc)
+    return poc_series.ffill()
+
+# ==========================================
+# CATEGORY 14: VOLUME PROFILE (Visible Range & Session)
+# ==========================================
+import numpy as np
+import pandas as pd
+
+def calc_volume_profile(df, lookback=100, bins=24):
+    tp = (df['high'] + df['low'] + df['close']) / 3
+    prices = tp.values
+    volumes = df['volume'].values
+    poc_arr = np.full(len(df), np.nan)
+    for i in range(lookback, len(df)):
+        window_p = prices[i-lookback:i]
+        window_v = volumes[i-lookback:i]
+        min_p = window_p.min()
+        max_p = window_p.max()
+        if max_p == min_p:
+            poc_arr[i] = min_p
+            continue
+        bin_edges = np.linspace(min_p, max_p, bins + 1)
+        indices = np.digitize(window_p, bin_edges) - 1
+        indices = np.clip(indices, 0, bins - 1)
+        vol_profile = np.bincount(indices, weights=window_v, minlength=bins)
+        max_bin = np.argmax(vol_profile)
+        poc_arr[i] = (bin_edges[max_bin] + bin_edges[max_bin+1]) / 2
+    poc = pd.Series(poc_arr, index=df.index)
+    tp_vwap = (tp * df['volume']).rolling(lookback, min_periods=1).sum() / df['volume'].rolling(lookback, min_periods=1).sum()
+    poc.fillna(tp_vwap, inplace=True)
+    return poc
+
+def calc_session_volume_profile(df, bins=50):
+    tp = (df['high'] + df['low'] + df['close']) / 3
+    volumes = df['volume']
+    poc = pd.Series(np.nan, index=df.index)
+    for date, session_df in df.groupby(df.index.date):
+        session_idx = session_df.index
+        if len(session_idx) < 2: continue
+        session_p = tp.loc[session_idx].values
+        session_v = volumes.loc[session_idx].values
+        s_poc = np.full(len(session_idx), np.nan)
+        s_poc[0] = session_p[0]
+        for i in range(1, len(session_idx)):
+            window_p = session_p[:i+1]
+            window_v = session_v[:i+1]
+            min_p = window_p.min()
+            max_p = window_p.max()
+            if max_p == min_p:
+                s_poc[i] = min_p
+                continue
+            bin_edges = np.linspace(min_p, max_p, bins + 1)
+            indices = np.digitize(window_p, bin_edges) - 1
+            indices = np.clip(indices, 0, bins - 1)
+            vol_profile = np.bincount(indices, weights=window_v, minlength=bins)
+            max_bin = np.argmax(vol_profile)
+            s_poc[i] = (bin_edges[max_bin] + bin_edges[max_bin+1]) / 2
+        poc.loc[session_idx] = s_poc
+    poc.fillna(tp, inplace=True)
+    return poc
+
+# ==========================================
+# CATEGORY 12: ADVANCED SMC V2 INDICATORS
+# ==========================================
+
+def calc_vwap_stdev(df):
+    '''
+    Calculates VWAP and its Standard Deviation.
+    '''
+    tp = (df['high'] + df['low'] + df['close']) / 3
+    volume = df['volume']
+    
+    if isinstance(df.index, pd.DatetimeIndex):
+        dates = df.index.date
+    else:
+        dates = pd.to_datetime(df['datetime']).dt.date
+        
+    cum_pv = (tp * volume).groupby(dates).cumsum()
+    cum_vol = volume.groupby(dates).cumsum()
+    vwap = cum_pv / cum_vol.replace(0, np.nan)
+    
+    diff = tp - vwap
+    diff_sq = diff ** 2
+    cum_vol_diff_sq = (diff_sq * volume).groupby(dates).cumsum()
+    variance = cum_vol_diff_sq / cum_vol.replace(0, np.nan)
+    stdev = np.sqrt(variance)
+    
+    return vwap, stdev
+
+def calc_order_blocks(df, lookback=20):
+    '''
+    Detects true unmitigated Order Blocks.
+    '''
+    atr = calc_atr(df, 14)
+    bullish_disp = df['close'] > df['close'].shift(1) + 1.0 * atr.shift(1)
+    bearish_disp = df['close'] < df['close'].shift(1) - 1.0 * atr.shift(1)
+    
+    is_bull_ob = bullish_disp.shift(-1).fillna(False)
+    is_bear_ob = bearish_disp.shift(-1).fillna(False)
+    
+    import numpy as np
+    import pandas as pd
+    
+    ob_bull_top = np.where(is_bull_ob, df['high'], np.nan)
+    ob_bull_bottom = np.where(is_bull_ob, df['low'], np.nan)
+    
+    ob_bear_bottom = np.where(is_bear_ob, df['low'], np.nan)
+    ob_bear_top = np.where(is_bear_ob, df['high'], np.nan)
+    
+    ob_bull_top_s = pd.Series(ob_bull_top, index=df.index).ffill()
+    ob_bull_bottom_s = pd.Series(ob_bull_bottom, index=df.index).ffill()
+    
+    ob_bear_bottom_s = pd.Series(ob_bear_bottom, index=df.index).ffill()
+    ob_bear_top_s = pd.Series(ob_bear_top, index=df.index).ffill()
+    
+    return ob_bull_top_s, ob_bull_bottom_s, ob_bear_bottom_s, ob_bear_top_s

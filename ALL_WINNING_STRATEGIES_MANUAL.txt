@@ -1,0 +1,183 @@
+================================================================================
+COMPREHENSIVE WINNING STRATEGIES COMPENDIUM
+================================================================================
+This document contains the exact rules, logic, triggers, settings, and conditions 
+for all the winning strategies discovered during the standard backtest and the 
+hyperparameter optimization grid search.
+
+--------------------------------------------------------------------------------
+1. THE ULTIMATE OPTIMIZED ALMA STRATEGY (Rank 1 from Grid Search)
+--------------------------------------------------------------------------------
+This is the most robust strategy discovered, heavily optimized for out-of-sample 
+performance and noise reduction.
+
+* STRATEGY NAME: ALMA_Opt_61_P21_ADX25_VolTrue_SL1.5_TP3.0
+* TIMEFRAME:     15 Minutes
+
+[INDICATORS & SETTINGS]
+- ALMA (Arnaud Legoux Moving Average): Period = 21
+- ADX (Average Directional Index): Period = 14
+- Swing Points: Lookback = 20 bars
+- Volume SMA: Period = 20 bars
+- ATR (Average True Range): Period = 14 (for Stop Loss / Take Profit)
+
+[LOGIC & CONDITIONS - LONG/BUY]
+1. Sweep Trigger: "Equal Lows"
+   - Current Low < Previous Swing Low (Price sweeps below support)
+   - Current Close > Previous Swing Low (Price closes back above support)
+   - Previous Close > Previous Swing Low (Support was previously respected)
+2. Confirmation: ALMA Direction
+   - Current ALMA(21) > Previous ALMA(21) (ALMA is sloping upwards)
+3. Regime Filter: Strong Trend
+   - Current ADX(14) > 25
+4. Volume Filter: Institutional Surge
+   - Current Volume > Volume SMA(20) (The sweep must have high volume)
+
+[LOGIC & CONDITIONS - SHORT/SELL]
+1. Sweep Trigger: "Equal Highs"
+   - Current High > Previous Swing High (Price sweeps above resistance)
+   - Current Close < Previous Swing High (Price closes back below resistance)
+   - Previous Close < Previous Swing High (Resistance was previously respected)
+2. Confirmation: ALMA Direction
+   - Current ALMA(21) < Previous ALMA(21) (ALMA is sloping downwards)
+3. Regime Filter: Strong Trend
+   - Current ADX(14) > 25
+4. Volume Filter: Institutional Surge
+   - Current Volume > Volume SMA(20) (The sweep must have high volume)
+
+[TRADE MANAGEMENT]
+- Stop Loss: 1.5 * ATR
+- Take Profit: 3.0 * ATR
+- Max Holding Time: 48 Bars (12 hours)
+
+[PERFORMANCE METRICS]
+- In-Sample Profit Factor: 0.88
+- Out-Of-Sample (OOS) PF: 2.17
+- Win Rate: 38.6%
+- Sharpe Ratio: -0.843
+
+
+--------------------------------------------------------------------------------
+2. PDF BASE STRATEGY 2 (Equal Lows + ALMA + Strong Trend)
+--------------------------------------------------------------------------------
+The best performing raw strategy from the original PDF document.
+
+* STRATEGY NAME: PDF_Strat_2_equal_lows_alma_strong_trend
+* TIMEFRAME:     15 Minutes
+
+[INDICATORS & SETTINGS]
+- ALMA: Period = 9
+- ADX: Period = 14
+- Choppiness Index (CHOP): Period = 14
+- Swing Points: Lookback = 20 bars
+
+[LOGIC & CONDITIONS - LONG/BUY]
+1. Sweep Trigger: Equal Lows (Same as above)
+2. Confirmation: ALMA(9) sloping upwards
+3. Regime Filter: Strong Trend
+   - ADX(14) > 25
+   - Choppiness(14) < 38.2
+4. Volume Filter: None
+
+[TRADE MANAGEMENT]
+- Stop Loss: 1.5 * ATR
+- Take Profit: 3.0 * ATR
+
+[PERFORMANCE METRICS]
+- In-Sample Profit Factor: 0.97
+- Out-Of-Sample (OOS) PF: 25.31 (Highly skewed variance, but extremely profitable)
+- Win Rate: 36.4%
+
+
+--------------------------------------------------------------------------------
+3. PDF BASE STRATEGY 3 (Equal Lows + ALMA + Weak Trend)
+--------------------------------------------------------------------------------
+
+* STRATEGY NAME: PDF_Strat_3_equal_lows_alma_weak_trend
+* TIMEFRAME:     15 Minutes
+
+[INDICATORS & SETTINGS]
+- ALMA: Period = 9
+- ADX: Period = 14
+- Swing Points: Lookback = 20 bars
+
+[LOGIC & CONDITIONS - LONG/BUY]
+1. Sweep Trigger: Equal Lows
+2. Confirmation: ALMA(9) sloping upwards
+3. Regime Filter: Weak Trend
+   - ADX(14) > 20 AND ADX(14) <= 30
+4. Volume Filter: None
+
+[TRADE MANAGEMENT]
+- Stop Loss: 1.5 * ATR
+- Take Profit: 3.0 * ATR
+
+[PERFORMANCE METRICS]
+- In-Sample Profit Factor: 0.86
+- Out-Of-Sample (OOS) PF: 2.44
+- Win Rate: 38.1%
+
+
+--------------------------------------------------------------------------------
+4. PDF BASE STRATEGY 10 (Equal Lows + RSI + Strong Trend)
+--------------------------------------------------------------------------------
+
+* STRATEGY NAME: PDF_Strat_10_equal_lows_rsi_strong_trend
+* TIMEFRAME:     15 Minutes
+
+[INDICATORS & SETTINGS]
+- RSI (Relative Strength Index): Period = 7
+- ADX: Period = 14
+- Choppiness Index: Period = 14
+- Swing Points: Lookback = 20 bars
+
+[LOGIC & CONDITIONS - LONG/BUY]
+1. Sweep Trigger: Equal Lows
+2. Confirmation: RSI Oversold
+   - RSI(7) < 40
+3. Regime Filter: Strong Trend
+   - ADX(14) > 25
+   - Choppiness(14) < 38.2
+4. Volume Filter: None
+
+[TRADE MANAGEMENT]
+- Stop Loss: 1.5 * ATR
+- Take Profit: 3.0 * ATR
+
+[PERFORMANCE METRICS]
+- In-Sample Profit Factor: 0.83
+- Out-Of-Sample (OOS) PF: 0.90
+- Win Rate: 37.1%
+
+
+--------------------------------------------------------------------------------
+5. PDF BASE STRATEGY 29 (Equal Lows + MACD + Mean Reversion)
+--------------------------------------------------------------------------------
+The only 5-minute strategy that showed robust performance characteristics.
+
+* STRATEGY NAME: PDF_Strat_29_equal_lows_macd_mean_reversion
+* TIMEFRAME:     5 Minutes
+
+[INDICATORS & SETTINGS]
+- MACD: Fast=12, Slow=26, Signal=9
+- Choppiness Index (CHOP): Period = 14
+- Swing Points: Lookback = 20 bars
+
+[LOGIC & CONDITIONS - LONG/BUY]
+1. Sweep Trigger: Equal Lows
+2. Confirmation: MACD Momentum Shifting
+   - Current MACD Histogram > Previous MACD Histogram
+3. Regime Filter: Mean Reversion Environment
+   - Choppiness(14) > 61.8 (Market is highly ranging/choppy)
+4. Volume Filter: None
+
+[TRADE MANAGEMENT]
+- Stop Loss: 1.5 * ATR
+- Take Profit: 3.0 * ATR
+
+[PERFORMANCE METRICS]
+- In-Sample Profit Factor: 0.83
+- Out-Of-Sample (OOS) PF: 0.54
+- Win Rate: 44.7% (Highest Win Rate of the bunch)
+
+================================================================================

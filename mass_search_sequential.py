@@ -5,6 +5,7 @@ import time
 import itertools
 import numpy as np
 import pandas as pd
+import concurrent.futures
 
 sys.path.insert(0, os.path.abspath('.'))
 from indicators_library import add_all_indicators
@@ -71,97 +72,109 @@ def main():
     kb = StrategyKnowledgeBase()
     skipped_count = 0
     
+    filtered_tasks = []
     for stype, c in tasks:
-        # Pre-filter using ML Knowledge Base
         if kb.has_been_tested(c):
             skipped_count += 1
             continue
-            
-        n_tested += 1
+        filtered_tasks.append((stype, c))
+        
+    logger.info(f"Skipped {skipped_count} previously tested configs via ML Knowledge Base.")
+    total_to_run = len(filtered_tasks)
+    
+    def evaluate_task(task_data):
+        stype, c = task_data
         fn = GRIDS[stype]['fn']
-        
-        is_god = False
-        god_results = {}
-        
         try:
-            # Stage 1: Synthetic Data Test
             synth_res = engine.run_full_validation(
                 precomputed['SYNTHETIC'], fn, c,
                 min_trades_per_day=0.2, min_assets=2, n_permutations=200
             )
             
-            # Log the result to the Strategy Learning Database
-            kb.log_result(c, synth_res, synth_res['passed'])
-            
-            if synth_res['passed']:
-                is_god = True
-                god_results['SYNTHETIC'] = synth_res
+            if not synth_res['passed']:
+                return (stype, c, synth_res, False, None)
                 
-                # Stage 2: Multi-Timeframe Gauntlet
-                for tf in ['1H', '30min', '15min', '5min']:
-                    tf_res = engine.run_full_validation(
-                        precomputed[tf], fn, c,
-                        min_trades_per_day=0.2, min_assets=2, n_permutations=200
-                    )
-                    if not tf_res['passed']:
-                        is_god = False
-                        break
-                    god_results[tf] = tf_res
-                    
+            god_results = {'SYNTHETIC': synth_res}
+            for tf in ['1H', '30min', '15min', '5min']:
+                tf_res = engine.run_full_validation(
+                    precomputed[tf], fn, c,
+                    min_trades_per_day=0.2, min_assets=2, n_permutations=200
+                )
+                if not tf_res['passed']:
+                    return (stype, c, synth_res, False, None)
+                god_results[tf] = tf_res
+                
+            return (stype, c, synth_res, True, god_results)
+            
         except Exception as e:
-            logger.error(f"Error evaluating {stype} with params {c}: {str(e)}", exc_info=True)
-            is_god = False
+            logger.error(f"Error evaluating {stype} with params {c}: {str(e)}")
+            return (stype, c, None, False, None)
+
+    # Execute massively in parallel using Threads.
+    # Numba nogil=True releases the GIL, allowing True C-Level Parallelism without memory copying!
+    max_w = os.cpu_count() or 4
+    logger.info(f"Launching {max_w} Parallel Numba Execution Threads...")
+    
+    with concurrent.futures.ThreadPoolExecutor(max_workers=max_w) as executor:
+        futures = {executor.submit(evaluate_task, t): t for t in filtered_tasks}
+        
+        for future in concurrent.futures.as_completed(futures):
+            stype, c, synth_res, is_god, god_results = future.result()
+            n_tested += 1
             
-        if n_tested % 50 == 0:
-            elapsed = time.time() - t0
-            rate = n_tested / elapsed if elapsed > 0 else 0
-            eta = (total_combos - n_tested) / rate if rate > 0 else 0
-            logger.info(f"[{n_tested}/{total_combos}] ETA: {eta:.0f}s | Rate: {rate:.1f} tests/sec | God Strats Found: {total_found}")
+            if synth_res is not None:
+                kb.log_result(c, synth_res, synth_res['passed'])
             
-        if is_god:
-            logger.info(f"  [GOD STRATEGY FOUND!!!] {stype} passed ALL timeframes and Synthetic data! {c}")
-            confirmed_gods[stype].append({'params': c, 'results': god_results})
-            total_found += 1
-            
-            with open(RESULTS_FILE, 'w') as f:
-                json.dump(confirmed_gods, f, indent=2, default=str)
+            if n_tested % 50 == 0:
+                elapsed = time.time() - t0
+                rate = n_tested / elapsed if elapsed > 0 else 0
+                eta = (total_to_run - n_tested) / rate if rate > 0 else 0
+                logger.info(f"[{n_tested}/{total_to_run}] ETA: {eta:.0f}s | Rate: {rate:.1f} tests/sec | God Strats Found: {total_found}")
                 
-            # Keep detailed report updated
-            with open("god_strategies_report.txt", "w") as f:
-                f.write("=== THE GOD STRATEGIES REPORT ===\n")
-                f.write("These strategies passed the gauntlet: Synthetic Data, 1H, 30m, 15m, and 5m timeframes across multiple assets.\n\n")
-                for s_type, strats in confirmed_gods.items():
-                    f.write(f"--- {s_type.upper()} ({len(strats)} found) ---\n")
-                    for i, s in enumerate(strats):
-                        f.write(f"\n[{s_type}] God Strategy #{i+1}\n")
-                        f.write(f"Parameters: {s['params']}\n")
-                        for tf in ['SYNTHETIC', '1H', '30min', '15min', '5min']:
-                            agg = s['results'][tf]['backtest']
-                            wf = s['results'][tf]['walkforward']
-                            perm = s['results'][tf]['permutation']
-                            f.write(f"  [{tf}] Expectancy: {agg['expectancy']:.4f} | OOS Exp: {wf['out_of_sample']['expectancy']:.4f} | Perm p-val: {perm['p_value']:.4f}\n")
-                        f.write("-" * 50 + "\n")
-            
-            # --- REAL-TIME MD DOCUMENTATION ---
-            desc = STRATEGY_DESCRIPTIONS.get(stype, {'logic': 'N/A', 'indicators': 'N/A'})
-            md_filename = f"god_strategy_{stype}_{total_found}.md"
-            with open(md_filename, "w", encoding='utf-8') as f:
-                f.write(f"# 👑 GOD STRATEGY: {stype.upper()}\n\n")
-                f.write("## Strategy Logic\n")
-                f.write(f"{desc['logic']}\n\n")
-                f.write("## Indicators Used\n")
-                f.write(f"{desc['indicators']}\n\n")
-                f.write("## Exact Settings\n")
-                f.write("```json\n")
-                f.write(json.dumps(c, indent=2) + "\n")
-                f.write("```\n\n")
-                f.write("## Core Metrics (Walk-Forward OOS across Timeframes)\n")
-                for tf in ['SYNTHETIC', '1H', '30min', '15min', '5min']:
-                    tf_res = god_results[tf]
-                    f.write(f"### {tf} Data\n")
-                    f.write(f"- **Expectancy:** {tf_res['walkforward']['out_of_sample']['expectancy']:.4f}\n")
-                    f.write(f"- **Sharpe Ratio:** {tf_res['walkforward']['out_of_sample']['sharpe_ratio']:.3f}\n")
-                    f.write(f"- **Permutation p-value:** {tf_res['permutation']['p_value']:.4f}\n\n")
+            if is_god:
+                logger.info(f"  [GOD STRATEGY FOUND!!!] {stype} passed ALL timeframes and Synthetic data! {c}")
+                confirmed_gods[stype].append({'params': c, 'results': god_results})
+                total_found += 1
+                
+                with open(RESULTS_FILE, 'w') as f:
+                    json.dump(confirmed_gods, f, indent=2, default=str)
+                    
+                # Keep detailed report updated
+                with open("god_strategies_report.txt", "w") as f:
+                    f.write("=== THE GOD STRATEGIES REPORT ===\n")
+                    f.write("These strategies passed the gauntlet: Synthetic Data, 1H, 30m, 15m, and 5m timeframes across multiple assets.\n\n")
+                    for s_type, strats in confirmed_gods.items():
+                        f.write(f"--- {s_type.upper()} ({len(strats)} found) ---\n")
+                        for i, s in enumerate(strats):
+                            f.write(f"\n[{s_type}] God Strategy #{i+1}\n")
+                            f.write(f"Parameters: {s['params']}\n")
+                            for tf in ['SYNTHETIC', '1H', '30min', '15min', '5min']:
+                                agg = s['results'][tf]['backtest']
+                                wf = s['results'][tf]['walkforward']
+                                perm = s['results'][tf]['permutation']
+                                f.write(f"  [{tf}] Expectancy: {agg['expectancy']:.4f} | OOS Exp: {wf['out_of_sample']['expectancy']:.4f} | Perm p-val: {perm['p_value']:.4f}\n")
+                            f.write("-" * 50 + "\n")
+                
+                # --- REAL-TIME MD DOCUMENTATION ---
+                desc = STRATEGY_DESCRIPTIONS.get(stype, {'logic': 'N/A', 'indicators': 'N/A'})
+                md_filename = f"god_strategy_{stype}_{total_found}.md"
+                with open(md_filename, "w", encoding='utf-8') as f:
+                    f.write(f"# 👑 GOD STRATEGY: {stype.upper()}\n\n")
+                    f.write("## Strategy Logic\n")
+                    f.write(f"{desc['logic']}\n\n")
+                    f.write("## Indicators Used\n")
+                    f.write(f"{desc['indicators']}\n\n")
+                    f.write("## Exact Settings\n")
+                    f.write("```json\n")
+                    f.write(json.dumps(c, indent=2) + "\n")
+                    f.write("```\n\n")
+                    f.write("## Core Metrics (Walk-Forward OOS across Timeframes)\n")
+                    for tf in ['SYNTHETIC', '1H', '30min', '15min', '5min']:
+                        tf_res = god_results[tf]
+                        f.write(f"### {tf} Data\n")
+                        f.write(f"- **Expectancy:** {tf_res['walkforward']['out_of_sample']['expectancy']:.4f}\n")
+                        f.write(f"- **Sharpe Ratio:** {tf_res['walkforward']['out_of_sample']['sharpe_ratio']:.3f}\n")
+                        f.write(f"- **Permutation p-value:** {tf_res['permutation']['p_value']:.4f}\n\n")
 
     logger.info(f"Search complete in {time.time() - t0:.0f} seconds.")
     logger.info(f"Total Confirmed Strategies: {total_found}")

@@ -10,6 +10,9 @@
 #property description "Expert Advisor for regime-switching strategy (MR & Trend Following)"
 #property strict
 
+#include <Trade\Trade.mqh>
+CTrade trade;
+
 // --- Input Parameters ---
 input group "=== Regime Detection ==="
 input int    ChopPeriod = 14;       // Choppiness Index period
@@ -115,40 +118,77 @@ void OnTick()
    bool is_trending = (choppiness < ChopThreshold && adx_value > TrendThreshold);
 
    //--- Trading Logic ---
-   if (is_ranging)
+   if (PositionsTotal() == 0) // Only trade if no open positions
      {
-      // Mean Reversion Strategy
-      if (stoch_k < OSLevel && rsi_value < 50) // Oversold conditions for BUY
+      if (is_ranging)
         {
-         // Place BUY order
-         // Simplified order placement - needs proper implementation with risk management
-         Print("Ranging Market: BUY Signal");
+         // Mean Reversion Strategy
+         if (stoch_k < OSLevel && rsi_value < 50) // Oversold conditions for BUY
+           {
+            double sl_dist = atr_value * FixedSL_ATR;
+            double sl = rates[0].close - sl_dist;
+            double tp = rates[0].close + (atr_value * FixedTP_ATR);
+            double volume = CalculateLotSize(sl_dist);
+            trade.Buy(volume, Symbol(), 0, sl, tp, "MR Buy");
+           }
+         else if (stoch_k > OBLevel && rsi_value > 50) // Overbought conditions for SELL
+           {
+            double sl_dist = atr_value * FixedSL_ATR;
+            double sl = rates[0].close + sl_dist;
+            double tp = rates[0].close - (atr_value * FixedTP_ATR);
+            double volume = CalculateLotSize(sl_dist);
+            trade.Sell(volume, Symbol(), 0, sl, tp, "MR Sell");
+           }
         }
-      else if (stoch_k > OBLevel && rsi_value > 50) // Overbought conditions for SELL
+      else if (is_trending)
         {
-         // Place SELL order
-         // Simplified order placement - needs proper implementation with risk management
-         Print("Ranging Market: SELL Signal");
+         // Trend Following Strategy
+         if (rates[0].close > fast_ema && fast_ema > slow_ema && adx_plus_di > adx_minus_di) // Uptrend
+           {
+            double sl_dist = atr_value * FixedSL_ATR;
+            double sl = rates[0].close - sl_dist;
+            double tp = rates[0].close + (atr_value * FixedTP_ATR);
+            double volume = CalculateLotSize(sl_dist);
+            trade.Buy(volume, Symbol(), 0, sl, tp, "TF Buy");
+           }
+         else if (rates[0].close < fast_ema && fast_ema < slow_ema && adx_minus_di > adx_plus_di) // Downtrend
+           {
+            double sl_dist = atr_value * FixedSL_ATR;
+            double sl = rates[0].close + sl_dist;
+            double tp = rates[0].close - (atr_value * FixedTP_ATR);
+            double volume = CalculateLotSize(sl_dist);
+            trade.Sell(volume, Symbol(), 0, sl, tp, "TF Sell");
+           }
         }
-     }
-   else if (is_trending)
-     {
-      // Trend Following Strategy
-      if (rates[0].close > fast_ema && fast_ema > slow_ema && adx_plus_di > adx_minus_di) // Uptrend
-        {
-         // Place BUY order
-         Print("Trending Market: BUY Signal");
-        }
-      else if (rates[0].close < fast_ema && fast_ema < slow_ema && adx_minus_di > adx_plus_di) // Downtrend
-        {
-         // Place SELL order
-         Print("Trending Market: SELL Signal");
-        }
-     }
-   else
-     {
-      Print("Neutral Market: Waiting for clear regime...");
      }
   }
+
+//+------------------------------------------------------------------+
+//| Calculate Lot Size based on Risk % and Stop Loss distance        |
+//+------------------------------------------------------------------+
+double CalculateLotSize(double sl_distance)
+  {
+   if (sl_distance <= 0) return 0.01;
+   
+   double risk_amount = AccountInfoDouble(ACCOUNT_BALANCE) * (RiskPercent / 100.0);
+   double tick_value = SymbolInfoDouble(Symbol(), SYMBOL_TRADE_TICK_VALUE);
+   double tick_size = SymbolInfoDouble(Symbol(), SYMBOL_TRADE_TICK_SIZE);
+   
+   if (tick_size == 0 || tick_value == 0) return 0.01;
+   
+   double sl_ticks = sl_distance / tick_size;
+   double lots = risk_amount / (sl_ticks * tick_value);
+   
+   double min_lot = SymbolInfoDouble(Symbol(), SYMBOL_VOLUME_MIN);
+   double max_lot = SymbolInfoDouble(Symbol(), SYMBOL_VOLUME_MAX);
+   double step_lot = SymbolInfoDouble(Symbol(), SYMBOL_VOLUME_STEP);
+   
+   lots = MathRound(lots / step_lot) * step_lot;
+   if (lots < min_lot) lots = min_lot;
+   if (lots > max_lot) lots = max_lot;
+   
+   return lots;
+  }
+
 
 //+------------------------------------------------------------------+

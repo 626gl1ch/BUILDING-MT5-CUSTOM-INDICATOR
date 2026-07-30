@@ -10,7 +10,7 @@ import pandas as pd
 sys.path.insert(0, os.path.abspath('.'))
 from indicators_library import add_all_indicators
 from backtest_core import BacktestCore
-from rbo_v2 import GRIDS, signal_rsi_divergence
+from rbo_v2 import GRIDS
 
 def get_param_combos(param_dict, max_combos=5000):
     keys = list(param_dict.keys())

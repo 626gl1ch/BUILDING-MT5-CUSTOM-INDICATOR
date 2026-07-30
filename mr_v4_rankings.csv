@@ -1,0 +1,5 @@
+Params,Strategy,Std_PF,WF_OOS_PF,Win_Rate_%,Sharpe,Trades,Status
+B [SL=1.5 TP=3.0 hold=100],MR8_SMC_Sweep_Quality,0.86,0.847,35.43,-1.288,899,FAIL
+B [SL=1.5 TP=3.0 hold=100],MR2_VWAP_Divergence,0.84,0.899,34.61,-1.885,1520,FAIL
+A [SL=1.5 TP=2.0 hold=100],MR8_SMC_Sweep_Quality,0.82,0.737,44.3,-1.796,905,FAIL
+A [SL=1.5 TP=2.0 hold=100],MR2_VWAP_Divergence,0.81,0.821,44.0,-2.272,1538,FAIL

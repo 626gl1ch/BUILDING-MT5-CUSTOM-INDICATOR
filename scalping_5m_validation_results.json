@@ -1,0 +1,850 @@
+[
+  {
+    "name": "EMA Pullback Scalper",
+    "category": "Trend Following",
+    "description": "Trades SuperSmoother Filter trend momentum when ADX > 25 indicates strong trend.",
+    "passed": "False",
+    "params": {
+      "entry": "ssf_cross",
+      "regime": "adx_strong",
+      "sl_atr": 1.5,
+      "tp_atr": 3.0,
+      "max_bars_hold": 36,
+      "modifier": "fast",
+      "risk_pct": 0.01,
+      "trailing": true
+    },
+    "aggregate_metrics": {
+      "total_trades": 22790,
+      "active_symbols": 4,
+      "expectancy": -1.7582,
+      "trades_per_day": 15.64,
+      "sharpe_ratio": -55.766,
+      "profit_factor": 0.24,
+      "win_rate": 18.53
+    },
+    "walkforward_metrics": {
+      "in_sample": {
+        "total_trades": 15910,
+        "active_symbols": 4,
+        "expectancy": -2.5196,
+        "trades_per_day": 15.61,
+        "sharpe_ratio": -54.407,
+        "profit_factor": 0.24,
+        "win_rate": 19.05
+      },
+      "out_of_sample": {
+        "total_trades": 6847,
+        "active_symbols": 4,
+        "expectancy": -5.8495,
+        "trades_per_day": 15.71,
+        "sharpe_ratio": -59.667,
+        "profit_factor": 0.17,
+        "win_rate": 17.27
+      }
+    },
+    "permutation_metrics": {
+      "real_sharpe": -0.7316,
+      "perm_sharpe_mean": -0.7316,
+      "perm_sharpe_p95": -0.7316,
+      "p_value": 0.55,
+      "passed": false
+    },
+    "symbol_metrics": {
+      "BTCUSDT": {
+        "total_trades": 5563,
+        "win_rate": 14.42,
+        "profit_factor": 0.06,
+        "sharpe_ratio": -69.27,
+        "max_drawdown": -100.0,
+        "net_pnl": -10000.0,
+        "final_balance": 0.0,
+        "expectancy": -1.7976,
+        "trades_per_day": 15.27,
+        "avg_win": 0.8056,
+        "avg_loss": 2.2361
+      },
+      "LTCUSDT": {
+        "total_trades": 5506,
+        "win_rate": 19.18,
+        "profit_factor": 0.32,
+        "sharpe_ratio": -54.245,
+        "max_drawdown": -100.0,
+        "net_pnl": -10000.0,
+        "final_balance": 0.0,
+        "expectancy": -1.8162,
+        "trades_per_day": 15.11,
+        "avg_win": 4.5486,
+        "avg_loss": 3.3266
+      },
+      "SOLUSDT": {
+        "total_trades": 5613,
+        "win_rate": 20.27,
+        "profit_factor": 0.33,
+        "sharpe_ratio": -49.113,
+        "max_drawdown": -100.0,
+        "net_pnl": -10000.0,
+        "final_balance": 0.0,
+        "expectancy": -1.7816,
+        "trades_per_day": 15.4,
+        "avg_win": 4.4219,
+        "avg_loss": 3.3591
+      },
+      "TRUMPUSDT": {
+        "total_trades": 6108,
+        "win_rate": 20.25,
+        "profit_factor": 0.27,
+        "sharpe_ratio": -50.435,
+        "max_drawdown": -100.0,
+        "net_pnl": -10000.0,
+        "final_balance": 0.0,
+        "expectancy": -1.6372,
+        "trades_per_day": 16.76,
+        "avg_win": 3.016,
+        "avg_loss": 2.8189
+      }
+    }
+  },
+  {
+    "name": "Donchian Volatility Breakout",
+    "category": "Volatility Breakout",
+    "description": "Enters when 20-period Donchian Channel High/Low is broken during low Choppiness.",
+    "passed": "False",
+    "params": {
+      "entry": "donchian_breakout",
+      "regime": "chop_trending",
+      "sl_atr": 1.5,
+      "tp_atr": 3.5,
+      "max_bars_hold": 48,
+      "modifier": "fast",
+      "risk_pct": 0.01,
+      "trailing": true
+    },
+    "aggregate_metrics": {
+      "total_trades": 10715,
+      "active_symbols": 4,
+      "expectancy": -3.7714,
+      "trades_per_day": 7.35,
+      "sharpe_ratio": -37.93,
+      "profit_factor": 0.12,
+      "win_rate": 16.64
+    },
+    "walkforward_metrics": {
+      "in_sample": {
+        "total_trades": 7491,
+        "active_symbols": 4,
+        "expectancy": -5.4008,
+        "trades_per_day": 7.35,
+        "sharpe_ratio": -36.424,
+        "profit_factor": 0.12,
+        "win_rate": 16.73
+      },
+      "out_of_sample": {
+        "total_trades": 3209,
+        "active_symbols": 4,
+        "expectancy": -12.5027,
+        "trades_per_day": 7.38,
+        "sharpe_ratio": -42.45,
+        "profit_factor": 0.18,
+        "win_rate": 16.49
+      }
+    },
+    "permutation_metrics": {
+      "real_sharpe": -0.7183,
+      "perm_sharpe_mean": -0.7183,
+      "perm_sharpe_p95": -0.7183,
+      "p_value": 1.0,
+      "passed": false
+    },
+    "symbol_metrics": {
+      "BTCUSDT": {
+        "total_trades": 2766,
+        "win_rate": 11.71,
+        "profit_factor": 0.04,
+        "sharpe_ratio": -50.033,
+        "max_drawdown": -100.0,
+        "net_pnl": -10000.0,
+        "final_balance": 0.0,
+        "expectancy": -3.6153,
+        "trades_per_day": 7.59,
+        "avg_win": 1.1612,
+        "avg_loss": 4.2491
+      },
+      "LTCUSDT": {
+        "total_trades": 2661,
+        "win_rate": 18.19,
+        "profit_factor": 0.15,
+        "sharpe_ratio": -36.34,
+        "max_drawdown": -100.0,
+        "net_pnl": -10000.0,
+        "final_balance": 0.0,
+        "expectancy": -3.758,
+        "trades_per_day": 7.3,
+        "avg_win": 3.6327,
+        "avg_loss": 5.4011
+      },
+      "SOLUSDT": {
+        "total_trades": 2278,
+        "win_rate": 17.95,
+        "profit_factor": 0.14,
+        "sharpe_ratio": -33.136,
+        "max_drawdown": -100.0,
+        "net_pnl": -9999.97,
+        "final_balance": 0.03,
+        "expectancy": -4.3898,
+        "trades_per_day": 6.25,
+        "avg_win": 3.8573,
+        "avg_loss": 6.1945
+      },
+      "TRUMPUSDT": {
+        "total_trades": 3010,
+        "win_rate": 18.7,
+        "profit_factor": 0.15,
+        "sharpe_ratio": -32.213,
+        "max_drawdown": -100.0,
+        "net_pnl": -10000.0,
+        "final_balance": 0.0,
+        "expectancy": -3.3223,
+        "trades_per_day": 8.26,
+        "avg_win": 3.189,
+        "avg_loss": 4.8204
+      }
+    }
+  },
+  {
+    "name": "Bollinger VWAP Mean Reversion",
+    "category": "Filtered Mean Reversion",
+    "description": "Buys when price dips below lower BB and VWAP in a high Choppiness ranging regime.",
+    "passed": "False",
+    "params": {
+      "entry": "bb_vwap_mr",
+      "regime": "chop_choppy",
+      "sl_atr": 2.0,
+      "tp_atr": 2.5,
+      "max_bars_hold": 24,
+      "modifier": "slow",
+      "risk_pct": 0.01,
+      "trailing": false
+    },
+    "aggregate_metrics": {
+      "total_trades": 430,
+      "active_symbols": 4,
+      "expectancy": -24.8869,
+      "trades_per_day": 0.3,
+      "sharpe_ratio": -2.714,
+      "profit_factor": 0.57,
+      "win_rate": 47.91
+    },
+    "walkforward_metrics": {
+      "in_sample": {
+        "total_trades": 304,
+        "active_symbols": 4,
+        "expectancy": -31.0437,
+        "trades_per_day": 0.3,
+        "sharpe_ratio": -3.415,
+        "profit_factor": 0.5,
+        "win_rate": 43.84
+      },
+      "out_of_sample": {
+        "total_trades": 0,
+        "active_symbols": 0,
+        "expectancy": 0.0,
+        "trades_per_day": 0.0,
+        "sharpe_ratio": 0.0,
+        "profit_factor": 0.0,
+        "win_rate": 0.0
+      }
+    },
+    "permutation_metrics": {
+      "real_sharpe": -0.2555,
+      "perm_sharpe_mean": -0.2555,
+      "perm_sharpe_p95": -0.2555,
+      "p_value": 1.0,
+      "passed": false
+    },
+    "symbol_metrics": {
+      "BTCUSDT": {
+        "total_trades": 81,
+        "win_rate": 46.91,
+        "profit_factor": 0.4,
+        "sharpe_ratio": -3.779,
+        "max_drawdown": -31.78,
+        "net_pnl": -3069.58,
+        "final_balance": 6930.42,
+        "expectancy": -37.8961,
+        "trades_per_day": 0.23,
+        "avg_win": 54.0988,
+        "avg_loss": 119.1939
+      },
+      "LTCUSDT": {
+        "total_trades": 136,
+        "win_rate": 52.21,
+        "profit_factor": 0.74,
+        "sharpe_ratio": -1.612,
+        "max_drawdown": -26.0,
+        "net_pnl": -1718.25,
+        "final_balance": 8281.75,
+        "expectancy": -12.6342,
+        "trades_per_day": 0.38,
+        "avg_win": 67.98,
+        "avg_loss": 100.6897
+      },
+      "SOLUSDT": {
+        "total_trades": 136,
+        "win_rate": 47.06,
+        "profit_factor": 0.55,
+        "sharpe_ratio": -3.203,
+        "max_drawdown": -35.63,
+        "net_pnl": -3292.98,
+        "final_balance": 6707.02,
+        "expectancy": -24.2131,
+        "trades_per_day": 0.38,
+        "avg_win": 64.1693,
+        "avg_loss": 102.7751
+      },
+      "TRUMPUSDT": {
+        "total_trades": 77,
+        "win_rate": 45.45,
+        "profit_factor": 0.6,
+        "sharpe_ratio": -2.264,
+        "max_drawdown": -19.98,
+        "net_pnl": -1909.92,
+        "final_balance": 8090.08,
+        "expectancy": -24.8042,
+        "trades_per_day": 0.21,
+        "avg_win": 81.9556,
+        "avg_loss": 113.7707
+      }
+    }
+  },
+  {
+    "name": "KAMA Adaptive Trend Scalper",
+    "category": "Adaptive Moving Average",
+    "description": "Uses Fractal Adaptive MA (FRAMA) & Hurst Exponent > 0.55 for trend riding.",
+    "passed": "False",
+    "params": {
+      "entry": "frama_breakout",
+      "regime": "hurst_trending",
+      "sl_atr": 1.5,
+      "tp_atr": 4.0,
+      "max_bars_hold": 48,
+      "modifier": "fast",
+      "risk_pct": 0.01,
+      "trailing": true
+    },
+    "aggregate_metrics": {
+      "total_trades": 3544,
+      "active_symbols": 4,
+      "expectancy": -11.3664,
+      "trades_per_day": 2.45,
+      "sharpe_ratio": -20.691,
+      "profit_factor": 0.2,
+      "win_rate": 19.85
+    },
+    "walkforward_metrics": {
+      "in_sample": {
+        "total_trades": 2514,
+        "active_symbols": 4,
+        "expectancy": -15.5597,
+        "trades_per_day": 2.47,
+        "sharpe_ratio": -20.646,
+        "profit_factor": 0.2,
+        "win_rate": 19.41
+      },
+      "out_of_sample": {
+        "total_trades": 1027,
+        "active_symbols": 4,
+        "expectancy": -30.5723,
+        "trades_per_day": 2.49,
+        "sharpe_ratio": -21.296,
+        "profit_factor": 0.19,
+        "win_rate": 20.92
+      }
+    },
+    "permutation_metrics": {
+      "real_sharpe": -0.6907,
+      "perm_sharpe_mean": -0.6907,
+      "perm_sharpe_p95": -0.6907,
+      "p_value": 0.57,
+      "passed": false
+    },
+    "symbol_metrics": {
+      "BTCUSDT": {
+        "total_trades": 905,
+        "win_rate": 14.92,
+        "profit_factor": 0.11,
+        "sharpe_ratio": -26.491,
+        "max_drawdown": -99.95,
+        "net_pnl": -9994.94,
+        "final_balance": 5.06,
+        "expectancy": -11.0441,
+        "trades_per_day": 2.48,
+        "avg_win": 8.8858,
+        "avg_loss": 14.5383
+      },
+      "LTCUSDT": {
+        "total_trades": 942,
+        "win_rate": 21.13,
+        "profit_factor": 0.24,
+        "sharpe_ratio": -19.206,
+        "max_drawdown": -99.44,
+        "net_pnl": -9944.57,
+        "final_balance": 55.43,
+        "expectancy": -10.5569,
+        "trades_per_day": 2.61,
+        "avg_win": 15.5367,
+        "avg_loss": 17.5456
+      },
+      "SOLUSDT": {
+        "total_trades": 994,
+        "win_rate": 21.73,
+        "profit_factor": 0.25,
+        "sharpe_ratio": -20.561,
+        "max_drawdown": -99.38,
+        "net_pnl": -9938.06,
+        "final_balance": 61.94,
+        "expectancy": -9.9981,
+        "trades_per_day": 2.75,
+        "avg_win": 15.6204,
+        "avg_loss": 17.1106
+      },
+      "TRUMPUSDT": {
+        "total_trades": 703,
+        "win_rate": 21.62,
+        "profit_factor": 0.22,
+        "sharpe_ratio": -16.506,
+        "max_drawdown": -97.47,
+        "net_pnl": -9748.0,
+        "final_balance": 252.0,
+        "expectancy": -13.8663,
+        "trades_per_day": 1.95,
+        "avg_win": 17.7066,
+        "avg_loss": 22.5761
+      }
+    }
+  },
+  {
+    "name": "MACD Zero-Lag Crossover",
+    "category": "Momentum Crossover",
+    "description": "Enters on MACD line crossing Signal line below/above zero level.",
+    "passed": "False",
+    "params": {
+      "entry": "macd_cross",
+      "regime": "none",
+      "sl_atr": 2.0,
+      "tp_atr": 3.0,
+      "max_bars_hold": 36,
+      "modifier": "fast",
+      "risk_pct": 0.01,
+      "trailing": false
+    },
+    "aggregate_metrics": {
+      "total_trades": 15600,
+      "active_symbols": 4,
+      "expectancy": -2.5653,
+      "trades_per_day": 10.7,
+      "sharpe_ratio": -20.268,
+      "profit_factor": 0.56,
+      "win_rate": 40.13
+    },
+    "walkforward_metrics": {
+      "in_sample": {
+        "total_trades": 10922,
+        "active_symbols": 4,
+        "expectancy": -3.6628,
+        "trades_per_day": 10.71,
+        "sharpe_ratio": -20.727,
+        "profit_factor": 0.56,
+        "win_rate": 39.49
+      },
+      "out_of_sample": {
+        "total_trades": 4655,
+        "active_symbols": 4,
+        "expectancy": -8.4152,
+        "trades_per_day": 10.68,
+        "sharpe_ratio": -19.262,
+        "profit_factor": 0.52,
+        "win_rate": 41.62
+      }
+    },
+    "permutation_metrics": {
+      "real_sharpe": -0.3249,
+      "perm_sharpe_mean": -0.3249,
+      "perm_sharpe_p95": -0.3249,
+      "p_value": 0.93,
+      "passed": false
+    },
+    "symbol_metrics": {
+      "BTCUSDT": {
+        "total_trades": 3824,
+        "win_rate": 38.7,
+        "profit_factor": 0.31,
+        "sharpe_ratio": -28.66,
+        "max_drawdown": -100.0,
+        "net_pnl": -10000.0,
+        "final_balance": 0.0,
+        "expectancy": -2.6151,
+        "trades_per_day": 10.49,
+        "avg_win": 3.0841,
+        "avg_loss": 6.2135
+      },
+      "LTCUSDT": {
+        "total_trades": 3940,
+        "win_rate": 40.76,
+        "profit_factor": 0.65,
+        "sharpe_ratio": -18.835,
+        "max_drawdown": -100.0,
+        "net_pnl": -9999.99,
+        "final_balance": 0.01,
+        "expectancy": -2.5381,
+        "trades_per_day": 10.81,
+        "avg_win": 11.6348,
+        "avg_loss": 12.2902
+      },
+      "SOLUSDT": {
+        "total_trades": 3814,
+        "win_rate": 41.03,
+        "profit_factor": 0.7,
+        "sharpe_ratio": -14.963,
+        "max_drawdown": -100.0,
+        "net_pnl": -9999.7,
+        "final_balance": 0.3,
+        "expectancy": -2.6218,
+        "trades_per_day": 10.46,
+        "avg_win": 15.1111,
+        "avg_loss": 14.9616
+      },
+      "TRUMPUSDT": {
+        "total_trades": 4022,
+        "win_rate": 40.03,
+        "profit_factor": 0.59,
+        "sharpe_ratio": -18.614,
+        "max_drawdown": -100.0,
+        "net_pnl": -9999.99,
+        "final_balance": 0.01,
+        "expectancy": -2.4863,
+        "trades_per_day": 11.04,
+        "avg_win": 8.8179,
+        "avg_loss": 10.0319
+      }
+    }
+  },
+  {
+    "name": "Stochastic RSI Extreme Reversion",
+    "category": "Oscillator Mean Reversion",
+    "description": "Triggers when StochRSI %K crosses %D in oversold (<20) or overbought (>80) zone.",
+    "passed": "False",
+    "params": {
+      "entry": "stoch_cross",
+      "regime": "chop_choppy",
+      "sl_atr": 1.5,
+      "tp_atr": 2.5,
+      "max_bars_hold": 24,
+      "modifier": "slow",
+      "risk_pct": 0.01,
+      "trailing": false
+    },
+    "aggregate_metrics": {
+      "total_trades": 2044,
+      "active_symbols": 4,
+      "expectancy": -18.2036,
+      "trades_per_day": 1.41,
+      "sharpe_ratio": -9.166,
+      "profit_factor": 0.45,
+      "win_rate": 37.12
+    },
+    "walkforward_metrics": {
+      "in_sample": {
+        "total_trades": 1440,
+        "active_symbols": 4,
+        "expectancy": -22.4253,
+        "trades_per_day": 1.42,
+        "sharpe_ratio": -8.402,
+        "profit_factor": 0.46,
+        "win_rate": 38.01
+      },
+      "out_of_sample": {
+        "total_trades": 601,
+        "active_symbols": 4,
+        "expectancy": -40.256,
+        "trades_per_day": 1.4,
+        "sharpe_ratio": -11.18,
+        "profit_factor": 0.35,
+        "win_rate": 34.85
+      }
+    },
+    "permutation_metrics": {
+      "real_sharpe": -0.4032,
+      "perm_sharpe_mean": -0.4032,
+      "perm_sharpe_p95": -0.4032,
+      "p_value": 0.43,
+      "passed": false
+    },
+    "symbol_metrics": {
+      "BTCUSDT": {
+        "total_trades": 523,
+        "win_rate": 39.01,
+        "profit_factor": 0.32,
+        "sharpe_ratio": -11.073,
+        "max_drawdown": -96.62,
+        "net_pnl": -9651.53,
+        "final_balance": 348.47,
+        "expectancy": -18.4542,
+        "trades_per_day": 1.44,
+        "avg_win": 22.209,
+        "avg_loss": 44.4582
+      },
+      "LTCUSDT": {
+        "total_trades": 488,
+        "win_rate": 32.79,
+        "profit_factor": 0.43,
+        "sharpe_ratio": -10.907,
+        "max_drawdown": -94.87,
+        "net_pnl": -9494.79,
+        "final_balance": 505.21,
+        "expectancy": -19.4565,
+        "trades_per_day": 1.34,
+        "avg_win": 44.6575,
+        "avg_loss": 50.7317
+      },
+      "SOLUSDT": {
+        "total_trades": 630,
+        "win_rate": 39.21,
+        "profit_factor": 0.56,
+        "sharpe_ratio": -7.627,
+        "max_drawdown": -90.7,
+        "net_pnl": -9083.02,
+        "final_balance": 916.98,
+        "expectancy": -14.4175,
+        "trades_per_day": 1.73,
+        "avg_win": 47.6173,
+        "avg_loss": 54.4242
+      },
+      "TRUMPUSDT": {
+        "total_trades": 403,
+        "win_rate": 37.47,
+        "profit_factor": 0.48,
+        "sharpe_ratio": -7.055,
+        "max_drawdown": -82.26,
+        "net_pnl": -8255.96,
+        "final_balance": 1744.04,
+        "expectancy": -20.4863,
+        "trades_per_day": 1.11,
+        "avg_win": 51.1132,
+        "avg_loss": 63.3891
+      }
+    }
+  },
+  {
+    "name": "Keltner Channel Reversion",
+    "category": "Channel Reversion",
+    "description": "Buys when price touches lower Keltner Band with RSI < 30.",
+    "passed": "False",
+    "params": {
+      "entry": "keltner_pullback",
+      "regime": "none",
+      "sl_atr": 1.5,
+      "tp_atr": 3.0,
+      "max_bars_hold": 36,
+      "modifier": "fast",
+      "risk_pct": 0.01,
+      "trailing": false
+    },
+    "aggregate_metrics": {
+      "total_trades": 19441,
+      "active_symbols": 4,
+      "expectancy": -2.0584,
+      "trades_per_day": 13.33,
+      "sharpe_ratio": -23.419,
+      "profit_factor": 0.55,
+      "win_rate": 35.7
+    },
+    "walkforward_metrics": {
+      "in_sample": {
+        "total_trades": 13581,
+        "active_symbols": 4,
+        "expectancy": -2.9462,
+        "trades_per_day": 13.32,
+        "sharpe_ratio": -22.675,
+        "profit_factor": 0.55,
+        "win_rate": 35.61
+      },
+      "out_of_sample": {
+        "total_trades": 5835,
+        "active_symbols": 4,
+        "expectancy": -6.8481,
+        "trades_per_day": 13.4,
+        "sharpe_ratio": -25.3,
+        "profit_factor": 0.52,
+        "win_rate": 35.79
+      }
+    },
+    "permutation_metrics": {
+      "real_sharpe": -0.3373,
+      "perm_sharpe_mean": -0.3373,
+      "perm_sharpe_p95": -0.3373,
+      "p_value": 0.975,
+      "passed": false
+    },
+    "symbol_metrics": {
+      "BTCUSDT": {
+        "total_trades": 4917,
+        "win_rate": 33.8,
+        "profit_factor": 0.28,
+        "sharpe_ratio": -36.216,
+        "max_drawdown": -100.0,
+        "net_pnl": -10000.0,
+        "final_balance": 0.0,
+        "expectancy": -2.0338,
+        "trades_per_day": 13.49,
+        "avg_win": 2.3014,
+        "avg_loss": 4.2473
+      },
+      "LTCUSDT": {
+        "total_trades": 4886,
+        "win_rate": 36.66,
+        "profit_factor": 0.66,
+        "sharpe_ratio": -20.408,
+        "max_drawdown": -100.0,
+        "net_pnl": -10000.0,
+        "final_balance": 0.0,
+        "expectancy": -2.0467,
+        "trades_per_day": 13.41,
+        "avg_win": 11.025,
+        "avg_loss": 9.6109
+      },
+      "SOLUSDT": {
+        "total_trades": 4688,
+        "win_rate": 35.45,
+        "profit_factor": 0.67,
+        "sharpe_ratio": -18.462,
+        "max_drawdown": -100.0,
+        "net_pnl": -10000.0,
+        "final_balance": 0.0,
+        "expectancy": -2.1331,
+        "trades_per_day": 12.86,
+        "avg_win": 12.1531,
+        "avg_loss": 9.9796
+      },
+      "TRUMPUSDT": {
+        "total_trades": 4950,
+        "win_rate": 36.87,
+        "profit_factor": 0.6,
+        "sharpe_ratio": -18.59,
+        "max_drawdown": -100.0,
+        "net_pnl": -10000.0,
+        "final_balance": 0.0,
+        "expectancy": -2.0202,
+        "trades_per_day": 13.58,
+        "avg_win": 8.3893,
+        "avg_loss": 8.0994
+      }
+    }
+  },
+  {
+    "name": "Statistical Z-Score Reversion",
+    "category": "Statistical Arbitrage",
+    "description": "Enters when 20-period price Z-score exceeds +/- 2.5 std deviations.",
+    "passed": "False",
+    "params": {
+      "entry": "zscore_extreme",
+      "regime": "hurst_mean_reverting",
+      "sl_atr": 2.0,
+      "tp_atr": 2.5,
+      "max_bars_hold": 24,
+      "modifier": "slow",
+      "risk_pct": 0.01,
+      "trailing": false
+    },
+    "aggregate_metrics": {
+      "total_trades": 5988,
+      "active_symbols": 4,
+      "expectancy": -6.6418,
+      "trades_per_day": 4.11,
+      "sharpe_ratio": -13.488,
+      "profit_factor": 0.51,
+      "win_rate": 43.81
+    },
+    "walkforward_metrics": {
+      "in_sample": {
+        "total_trades": 4131,
+        "active_symbols": 4,
+        "expectancy": -9.2836,
+        "trades_per_day": 4.05,
+        "sharpe_ratio": -12.743,
+        "profit_factor": 0.52,
+        "win_rate": 44.18
+      },
+      "out_of_sample": {
+        "total_trades": 1847,
+        "active_symbols": 4,
+        "expectancy": -17.9051,
+        "trades_per_day": 4.25,
+        "sharpe_ratio": -15.22,
+        "profit_factor": 0.46,
+        "win_rate": 43.05
+      }
+    },
+    "permutation_metrics": {
+      "real_sharpe": -0.3501,
+      "perm_sharpe_mean": -0.3501,
+      "perm_sharpe_p95": -0.3501,
+      "p_value": 0.98,
+      "passed": false
+    },
+    "symbol_metrics": {
+      "BTCUSDT": {
+        "total_trades": 1544,
+        "win_rate": 40.09,
+        "profit_factor": 0.24,
+        "sharpe_ratio": -20.93,
+        "max_drawdown": -99.99,
+        "net_pnl": -9999.46,
+        "final_balance": 0.54,
+        "expectancy": -6.4763,
+        "trades_per_day": 4.24,
+        "avg_win": 5.1672,
+        "avg_loss": 14.2681
+      },
+      "LTCUSDT": {
+        "total_trades": 1423,
+        "win_rate": 44.41,
+        "profit_factor": 0.58,
+        "sharpe_ratio": -12.239,
+        "max_drawdown": -99.31,
+        "net_pnl": -9932.08,
+        "final_balance": 67.92,
+        "expectancy": -6.9797,
+        "trades_per_day": 3.91,
+        "avg_win": 21.7814,
+        "avg_loss": 29.9594
+      },
+      "SOLUSDT": {
+        "total_trades": 1423,
+        "win_rate": 43.99,
+        "profit_factor": 0.61,
+        "sharpe_ratio": -10.773,
+        "max_drawdown": -98.7,
+        "net_pnl": -9866.81,
+        "final_balance": 133.19,
+        "expectancy": -6.9338,
+        "trades_per_day": 3.91,
+        "avg_win": 24.4852,
+        "avg_loss": 31.6117
+      },
+      "TRUMPUSDT": {
+        "total_trades": 1598,
+        "win_rate": 46.75,
+        "profit_factor": 0.62,
+        "sharpe_ratio": -10.012,
+        "max_drawdown": -98.82,
+        "net_pnl": -9871.41,
+        "final_balance": 128.59,
+        "expectancy": -6.1774,
+        "trades_per_day": 4.39,
+        "avg_win": 21.1895,
+        "avg_loss": 30.1998
+      }
+    }
+  }
+]

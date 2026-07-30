@@ -9,8 +9,3 @@ Performance (Aggregate): Expectancy=0.5000, PF=2.00, WR=60.0%, Sharpe=1.500, Tra
 Walk-Forward OOS: Expectancy=0.4000, Sharpe=1.200
 Permutation Test: p_value=0.0100
 Per-Symbol Breakdown:
---------------------------------------------------
---- DONCHIAN_BREAKOUT (0 found) ---
---- BB_VWAP_MR (0 found) ---
---- RSI_DIVERGENCE (0 found) ---
---- SQUEEZE_BREAKOUT (0 found) ---

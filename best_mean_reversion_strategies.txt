@@ -1,0 +1,55 @@
+=== BEST MEAN REVERSION STRATEGIES (5M CRYPTO) ===
+
+Note: All strategies use a 0.06% round-trip execution cost model. Mean Reversion on 5m crypto data suffers from high noise-to-signal ratios, meaning wide stop-losses paired with tight take-profits (asymmetric scalps) yield the highest consistency.
+
+--- 1. HIGH WIN-RATE ASYMMETRIC SQUEEZE (82.7% Win Rate) ---
+Performance: Profit Factor 1.06 | Win Rate 82.76% | 58 Trades/Year (Aggregate)
+Concept: Enter mean-reverting longs when the price aggressively violates the lower Bollinger Band AND RSI hits severe oversold exhaustion, but ONLY if the higher timeframe trend remains bullish.
+
+* Long Entry Conditions (All must be true):
+  1. Price Close < Bollinger Band Lower (Period: 20, StdDev: 2.5)
+  2. RSI(3) < 25
+  3. Price Close > EMA(50)
+
+* Short Entry Conditions (All must be true):
+  1. Price Close > Bollinger Band Upper (Period: 20, StdDev: 2.5)
+  2. RSI(3) > 75
+  3. Price Close < EMA(50)
+
+* Exit Structure:
+  - Stop Loss: 3.0 * ATR(14) (Wide breathing room for noise)
+  - Take Profit: 0.8 * ATR(14) (Fast scalp out)
+  - Time Stop: 15 bars
+
+
+--- 2. CONSERVATIVE HTF TREND EXHAUSTION (47.3% Win Rate) ---
+Performance: Profit Factor 1.14 | Win Rate 47.37% | 57 Trades/Year (Aggregate)
+Concept: Trading standard Bollinger Band exhaustion setups strictly in the direction of the trend, but targeting a higher Risk-to-Reward ratio.
+
+* Long Entry Conditions:
+  1. Price Close < Bollinger Band Lower (Period: 20, StdDev: 2.5)
+  2. Price Close > EMA(50)
+
+* Short Entry Conditions:
+  1. Price Close > Bollinger Band Upper (Period: 20, StdDev: 2.5)
+  2. Price Close < EMA(50)
+
+* Exit Structure:
+  - Stop Loss: 1.5 * ATR(14)
+  - Take Profit: 3.0 * ATR(14)
+  - Time Stop: 20 bars
+
+
+--- 3. BALANCED ASYMMETRIC SCALP (81.8% Win Rate) ---
+Performance: Profit Factor 1.01 | Win Rate 81.82% | 55 Trades/Year (Aggregate)
+Concept: A slightly tighter RSI threshold variation of the High Win-Rate Squeeze. Entering only on extreme panic dumps.
+
+* Long Entry Conditions:
+  1. Price Close < Bollinger Band Lower (Period: 20, StdDev: 2.5)
+  2. RSI(3) < 20
+  3. Price Close > EMA(50)
+
+* Exit Structure:
+  - Stop Loss: 3.0 * ATR(14)
+  - Take Profit: 0.8 * ATR(14)
+  - Time Stop: 15 bars

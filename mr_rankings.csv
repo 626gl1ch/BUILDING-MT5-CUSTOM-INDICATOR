@@ -1,0 +1,5 @@
+Strategy,Std_PF,WF_OOS_PF,Win_Rate_%,Sharpe,Trades,Status
+MR2_VWAP_RSI_Divergence,0.78,0.786,35.58,-2.964,2092,FAIL
+MR1_BB_Extreme_Fade,0.72,0.0,32.51,-1.831,445,FAIL
+MR3_SMC_LiqSweep_5m,0.7,0.699,33.11,-6.696,4857,FAIL
+MR4_StochRSI_Squeeze,0.66,0.666,32.57,-5.71,2880,FAIL

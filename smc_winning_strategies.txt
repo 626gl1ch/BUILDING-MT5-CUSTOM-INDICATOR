@@ -1,0 +1,76 @@
+================================================================================
+ WINNING SMC LIQUIDITY SWEEP STRATEGIES - COMPREHENSIVE ARCHIVE
+================================================================================
+
+This document serves as the absolute master blueprint for the profitable Smart Money Concepts (SMC) strategies discovered during the algorithmic research cycle.
+
+--------------------------------------------------------------------------------
+🏆 STRATEGY 1: SMC V2 "THE HOLY GRAIL" (Order Block + Session POC)
+--------------------------------------------------------------------------------
+Performance Metrics:
+- Target Timeframe: 1-Hour (1H)
+- Profit Factor: 4.76
+- Win Rate: 67.5%
+- Sharpe Ratio: 1.612
+- Risk to Reward (R:R): 1 : 1.6
+- Execution Profile: Highly selective, low frequency, extremely high probability.
+
+## 1. Core Mechanics & Trade Management
+- Asset Class: High Liquidity Crypto (BTC, SOL, LTC)
+- Stop Loss (SL): 2.5 * ATR(14)
+- Take Profit (TP): 4.0 * ATR(14)
+- Trailing Stop: Disabled (Fixed Target)
+- Capital Risk: 1% - 2% per trade.
+
+## 2. The Logic & Philosophy
+Retail traders place their stop losses exactly above or below obvious "Swing" points (recent highs/lows). Smart Money (institutions) deliberately drive the price past these swing points to trigger retail stop losses, creating enough liquidity for the institution to enter their massive orders in the opposite direction. 
+To avoid getting caught in "fake sweeps" (breakouts that actually continue), this strategy requires the sweep to perfectly align with two massive institutional footprints: The Daily Point of Control (where the most volume was traded) and an Unmitigated Order Block (where massive displacement originated).
+
+## 3. Required Indicators & Setup
+1. Swing Tracker: 20-period rolling Swing Highs and Swing Lows.
+2. Volume Profile (SVP): A Daily Session Volume Profile binned into 50 rows. The exact price bin with the highest volume becomes the Point of Control (POC).
+3. Order Blocks (OB): Identified by scanning for massive price displacement (e.g. current close > previous close + 1 ATR). The candle immediately preceding the displacement is marked as the "Order Block" and its High/Low levels are drawn forward in time until price touches (mitigates) them.
+
+## 4. Exact Entry Triggers & Conditions
+
+### LONG ENTRY (Buying the Dip)
+All of the following conditions MUST be met simultaneously on the 1-Hour chart:
+1. The Directional Bias: The current Closing price MUST be strictly ABOVE the previous day's Session Volume Profile Point of Control (POC). This proves institutional accumulation is supporting the market from below.
+2. The Order Block Trap: The current Low price MUST reach down into an active, unmitigated Bullish Order Block zone (Low <= OB Top AND Low >= OB Bottom).
+3. The Sweep (Trigger): 
+   - The current Low must drop strictly BELOW the previous 20-period Swing Low.
+   - The current Close must rapidly reverse and close back ABOVE the previous 20-period Swing Low.
+   - The previous candle's close must have been safely above the Swing Low.
+   
+Action: Execute LONG Market Order immediately upon candle close. Place SL at Entry - (2.5 * ATR). Place TP at Entry + (4.0 * ATR).
+
+### SHORT ENTRY (Selling the Rip)
+All of the following conditions MUST be met simultaneously on the 1-Hour chart:
+1. The Directional Bias: The current Closing price MUST be strictly BELOW the previous day's Session Volume Profile Point of Control (POC). This proves institutional distribution is suppressing the market from above.
+2. The Order Block Trap: The current High price MUST reach up into an active, unmitigated Bearish Order Block zone (High <= OB Top AND High >= OB Bottom).
+3. The Sweep (Trigger): 
+   - The current High must spike strictly ABOVE the previous 20-period Swing High.
+   - The current Close must rapidly reverse and close back BELOW the previous 20-period Swing High.
+   - The previous candle's close must have been safely below the Swing High.
+   
+Action: Execute SHORT Market Order immediately upon candle close. Place SL at Entry + (2.5 * ATR). Place TP at Entry - (4.0 * ATR).
+
+--------------------------------------------------------------------------------
+🥈 STRATEGY 2: SMC V1 (Session POC Filter Only)
+--------------------------------------------------------------------------------
+Performance Metrics:
+- Target Timeframe: 1-Hour (1H)
+- Profit Factor: 1.60
+- Win Rate: 55.7%
+- Sharpe Ratio: 0.984
+
+## 1. Description
+This is the lighter version of the Holy Grail strategy. It uses the exact same risk management (2.5 ATR SL / 4.0 ATR TP) and the exact same Session Volume Profile (POC) directional bias logic, but it DOES NOT require the sweep to occur inside an Order Block.
+
+## 2. Logic & Usage
+By removing the strict Order Block requirement, this strategy will execute trades more frequently (capturing sweeps that happen in empty space as long as they respect the POC). 
+While the Win Rate drops from 67.5% to 55.7%, and the Profit Factor drops from 4.76 to 1.60, it remains highly profitable on the 1-Hour chart. It is an excellent fallback strategy if the market environment is trending smoothly without returning to historical order blocks.
+
+## 3. Entry Rules
+- LONG: Sweep the 20-period Swing Low + Reject (Close above) + Price is currently ABOVE the previous day's POC.
+- SHORT: Sweep the 20-period Swing High + Reject (Close below) + Price is currently BELOW the previous day's POC.

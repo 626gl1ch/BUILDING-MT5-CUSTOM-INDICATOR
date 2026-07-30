@@ -1,0 +1,164 @@
+=== OPTIMIZED ALMA STRATEGY RESULTS ===
+Ranked by Out-Of-Sample (OOS) Profit Factor
+============================================================
+
+Rank 1: ALMA_Opt_61_P21_ADX25_VolTrue_SL1.5_TP3.0
+  Params:       {"alma_period": 21, "adx_threshold": 25, "require_vol_surge": true, "sl_atr": 1.5, "tp_atr": 3.0, "max_bars_hold": 48, "risk_pct": 0.01}
+  In-Sample PF: 0.88
+  OOS PF:       2.17
+  Sharpe Ratio: -0.843
+  Win Rate:     38.6%
+  Total Trades: 139
+----------------------------------------
+Rank 2: ALMA_Opt_60_P21_ADX25_VolTrue_SL1.5_TP2.5
+  Params:       {"alma_period": 21, "adx_threshold": 25, "require_vol_surge": true, "sl_atr": 1.5, "tp_atr": 2.5, "max_bars_hold": 48, "risk_pct": 0.01}
+  In-Sample PF: 0.82
+  OOS PF:       1.98
+  Sharpe Ratio: -1.194
+  Win Rate:     40.6%
+  Total Trades: 140
+----------------------------------------
+Rank 3: ALMA_Opt_64_P21_ADX25_VolTrue_SL2.0_TP3.0
+  Params:       {"alma_period": 21, "adx_threshold": 25, "require_vol_surge": true, "sl_atr": 2.0, "tp_atr": 3.0, "max_bars_hold": 48, "risk_pct": 0.01}
+  In-Sample PF: 0.80
+  OOS PF:       1.76
+  Sharpe Ratio: -1.006
+  Win Rate:     43.1%
+  Total Trades: 138
+----------------------------------------
+Rank 4: ALMA_Opt_37_P14_ADX25_VolTrue_SL1.5_TP3.0
+  Params:       {"alma_period": 14, "adx_threshold": 25, "require_vol_surge": true, "sl_atr": 1.5, "tp_atr": 3.0, "max_bars_hold": 48, "risk_pct": 0.01}
+  In-Sample PF: 0.83
+  OOS PF:       1.64
+  Sharpe Ratio: -1.253
+  Win Rate:     36.4%
+  Total Trades: 169
+----------------------------------------
+Rank 5: ALMA_Opt_63_P21_ADX25_VolTrue_SL2.0_TP2.5
+  Params:       {"alma_period": 21, "adx_threshold": 25, "require_vol_surge": true, "sl_atr": 2.0, "tp_atr": 2.5, "max_bars_hold": 48, "risk_pct": 0.01}
+  In-Sample PF: 0.75
+  OOS PF:       1.59
+  Sharpe Ratio: -1.255
+  Win Rate:     45.5%
+  Total Trades: 139
+----------------------------------------
+Rank 6: ALMA_Opt_36_P14_ADX25_VolTrue_SL1.5_TP2.5
+  Params:       {"alma_period": 14, "adx_threshold": 25, "require_vol_surge": true, "sl_atr": 1.5, "tp_atr": 2.5, "max_bars_hold": 48, "risk_pct": 0.01}
+  In-Sample PF: 0.75
+  OOS PF:       1.45
+  Sharpe Ratio: -1.491
+  Win Rate:     38.8%
+  Total Trades: 170
+----------------------------------------
+Rank 7: ALMA_Opt_49_P21_ADX20_VolTrue_SL1.5_TP3.0
+  Params:       {"alma_period": 21, "adx_threshold": 20, "require_vol_surge": true, "sl_atr": 1.5, "tp_atr": 3.0, "max_bars_hold": 48, "risk_pct": 0.01}
+  In-Sample PF: 0.76
+  OOS PF:       1.45
+  Sharpe Ratio: -1.362
+  Win Rate:     35.5%
+  Total Trades: 186
+----------------------------------------
+Rank 8: ALMA_Opt_40_P14_ADX25_VolTrue_SL2.0_TP3.0
+  Params:       {"alma_period": 14, "adx_threshold": 25, "require_vol_surge": true, "sl_atr": 2.0, "tp_atr": 3.0, "max_bars_hold": 48, "risk_pct": 0.01}
+  In-Sample PF: 0.83
+  OOS PF:       1.43
+  Sharpe Ratio: -1.015
+  Win Rate:     42.7%
+  Total Trades: 169
+----------------------------------------
+Rank 9: ALMA_Opt_48_P21_ADX20_VolTrue_SL1.5_TP2.5
+  Params:       {"alma_period": 21, "adx_threshold": 20, "require_vol_surge": true, "sl_atr": 1.5, "tp_atr": 2.5, "max_bars_hold": 48, "risk_pct": 0.01}
+  In-Sample PF: 0.69
+  OOS PF:       1.33
+  Sharpe Ratio: -1.691
+  Win Rate:     37.6%
+  Total Trades: 188
+----------------------------------------
+Rank 10: ALMA_Opt_39_P14_ADX25_VolTrue_SL2.0_TP2.5
+  Params:       {"alma_period": 14, "adx_threshold": 25, "require_vol_surge": true, "sl_atr": 2.0, "tp_atr": 2.5, "max_bars_hold": 48, "risk_pct": 0.01}
+  In-Sample PF: 0.74
+  OOS PF:       1.25
+  Sharpe Ratio: -1.353
+  Win Rate:     44.8%
+  Total Trades: 169
+----------------------------------------
+Rank 11: ALMA_Opt_52_P21_ADX20_VolTrue_SL2.0_TP3.0
+  Params:       {"alma_period": 21, "adx_threshold": 20, "require_vol_surge": true, "sl_atr": 2.0, "tp_atr": 3.0, "max_bars_hold": 48, "risk_pct": 0.01}
+  In-Sample PF: 0.68
+  OOS PF:       1.18
+  Sharpe Ratio: -1.611
+  Win Rate:     39.4%
+  Total Trades: 183
+----------------------------------------
+Rank 12: ALMA_Opt_25_P14_ADX20_VolTrue_SL1.5_TP3.0
+  Params:       {"alma_period": 14, "adx_threshold": 20, "require_vol_surge": true, "sl_atr": 1.5, "tp_atr": 3.0, "max_bars_hold": 48, "risk_pct": 0.01}
+  In-Sample PF: 0.74
+  OOS PF:       1.08
+  Sharpe Ratio: -1.763
+  Win Rate:     34.6%
+  Total Trades: 232
+----------------------------------------
+Rank 13: ALMA_Opt_51_P21_ADX20_VolTrue_SL2.0_TP2.5
+  Params:       {"alma_period": 21, "adx_threshold": 20, "require_vol_surge": true, "sl_atr": 2.0, "tp_atr": 2.5, "max_bars_hold": 48, "risk_pct": 0.01}
+  In-Sample PF: 0.63
+  OOS PF:       1.08
+  Sharpe Ratio: -1.848
+  Win Rate:     41.8%
+  Total Trades: 185
+----------------------------------------
+Rank 14: ALMA_Opt_13_P9_ADX25_VolTrue_SL1.5_TP3.0
+  Params:       {"alma_period": 9, "adx_threshold": 25, "require_vol_surge": true, "sl_atr": 1.5, "tp_atr": 3.0, "max_bars_hold": 48, "risk_pct": 0.01}
+  In-Sample PF: 0.70
+  OOS PF:       1.04
+  Sharpe Ratio: -1.632
+  Win Rate:     34.9%
+  Total Trades: 212
+----------------------------------------
+Rank 15: ALMA_Opt_16_P9_ADX25_VolTrue_SL2.0_TP3.0
+  Params:       {"alma_period": 9, "adx_threshold": 25, "require_vol_surge": true, "sl_atr": 2.0, "tp_atr": 3.0, "max_bars_hold": 48, "risk_pct": 0.01}
+  In-Sample PF: 0.73
+  OOS PF:       1.04
+  Sharpe Ratio: -1.284
+  Win Rate:     41.5%
+  Total Trades: 211
+----------------------------------------
+Rank 16: ALMA_Opt_67_P21_ADX25_VolFalse_SL1.5_TP3.0
+  Params:       {"alma_period": 21, "adx_threshold": 25, "require_vol_surge": false, "sl_atr": 1.5, "tp_atr": 3.0, "max_bars_hold": 48, "risk_pct": 0.01}
+  In-Sample PF: 0.78
+  OOS PF:       1.00
+  Sharpe Ratio: -1.258
+  Win Rate:     37.8%
+  Total Trades: 303
+----------------------------------------
+Rank 17: ALMA_Opt_4_P9_ADX20_VolTrue_SL2.0_TP3.0
+  Params:       {"alma_period": 9, "adx_threshold": 20, "require_vol_surge": true, "sl_atr": 2.0, "tp_atr": 3.0, "max_bars_hold": 48, "risk_pct": 0.01}
+  In-Sample PF: 0.68
+  OOS PF:       0.99
+  Sharpe Ratio: -1.778
+  Win Rate:     40.1%
+  Total Trades: 285
+----------------------------------------
+Rank 18: ALMA_Opt_24_P14_ADX20_VolTrue_SL1.5_TP2.5
+  Params:       {"alma_period": 14, "adx_threshold": 20, "require_vol_surge": true, "sl_atr": 1.5, "tp_atr": 2.5, "max_bars_hold": 48, "risk_pct": 0.01}
+  In-Sample PF: 0.67
+  OOS PF:       0.99
+  Sharpe Ratio: -2.020
+  Win Rate:     36.9%
+  Total Trades: 234
+----------------------------------------
+Rank 19: ALMA_Opt_12_P9_ADX25_VolTrue_SL1.5_TP2.5
+  Params:       {"alma_period": 9, "adx_threshold": 25, "require_vol_surge": true, "sl_atr": 1.5, "tp_atr": 2.5, "max_bars_hold": 48, "risk_pct": 0.01}
+  In-Sample PF: 0.67
+  OOS PF:       0.98
+  Sharpe Ratio: -1.666
+  Win Rate:     38.7%
+  Total Trades: 214
+----------------------------------------
+Rank 20: ALMA_Opt_28_P14_ADX20_VolTrue_SL2.0_TP3.0
+  Params:       {"alma_period": 14, "adx_threshold": 20, "require_vol_surge": true, "sl_atr": 2.0, "tp_atr": 3.0, "max_bars_hold": 48, "risk_pct": 0.01}
+  In-Sample PF: 0.72
+  OOS PF:       0.97
+  Sharpe Ratio: -1.670
+  Win Rate:     39.8%
+  Total Trades: 231
+----------------------------------------
